@@ -1,0 +1,6 @@
+Dudas:
+	*Administrador tiene que cargar domicilio?
+	*Se tiene que validar el registro de un administrador? 
+	*Reg. Admin vs Reg. Cliente
+	*Si Cliente tiene dom. y Admin no, que columnas tiene la BD?
+	*Como funcionan las clases DAO y la ConexionBD
