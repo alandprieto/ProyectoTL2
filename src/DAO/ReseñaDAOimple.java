@@ -51,9 +51,9 @@ public class ReseñaDAOimple implements ReseñaDAO {
     public List<Reseña> listarNoAprobadas() {
         List<Reseña> resenias = new ArrayList<>();
         String sql = "SELECT * FROM RESENIA WHERE APROBADO = 0";
+        Connection conn = ConexionBD.getConnection();
 
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()) {
 
             UsuarioDAOimple usuarioDAO = new UsuarioDAOimple();
@@ -80,9 +80,9 @@ public class ReseñaDAOimple implements ReseñaDAO {
     @Override
     public void aprobarResenia(int idResenia) {
         String sql = "UPDATE RESENIA SET APROBADO = 1 WHERE ID = ?";
+        Connection conn = ConexionBD.getConnection();
 
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idResenia);
             int filasAfectadas = pstmt.executeUpdate();
@@ -101,9 +101,9 @@ public class ReseñaDAOimple implements ReseñaDAO {
     @Override
     public void eliminar(int idResenia) {
         String sql = "DELETE FROM RESENIA WHERE ID = ?";
+        Connection conn = ConexionBD.getConnection();
 
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idResenia);
             int filasAfectadas = pstmt.executeUpdate();

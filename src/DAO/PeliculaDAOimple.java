@@ -51,13 +51,14 @@ public class PeliculaDAOimple implements PeliculaDAO {
     public List<Pelicula> listarTodas() {
         List<Pelicula> peliculas = new ArrayList<>();
         String sql = "SELECT * FROM PELICULA";
+        Connection conn = ConexionBD.getConnection();
 
-        try (Connection conn = ConexionBD.getConnection();
-                Statement stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Pelicula pelicula = new Pelicula();
+                pelicula.setID(rs.getInt("ID"));
                 pelicula.setTitulo(rs.getString("TITULO"));
                 pelicula.setDirector(new Staff(rs.getString("DIRECTOR"), "Director"));
                 int duracionMinutos = rs.getInt("DURACION");
@@ -75,8 +76,8 @@ public class PeliculaDAOimple implements PeliculaDAO {
     @Override
     public boolean existePelicula(int peliculaID) {
         String sql = "SELECT COUNT(*) AS total FROM PELICULA WHERE ID = ?";
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = ConexionBD.getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, peliculaID);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
@@ -92,8 +93,8 @@ public class PeliculaDAOimple implements PeliculaDAO {
     @Override
     public void eliminar(int peliculaID) {
         String sql = "DELETE FROM PELICULA WHERE ID = ?";
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = ConexionBD.getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, peliculaID);
             int filasAfectadas = pstmt.executeUpdate();
             if (filasAfectadas > 0) {
@@ -109,8 +110,8 @@ public class PeliculaDAOimple implements PeliculaDAO {
     @Override
     public void actualizar(Pelicula pelicula) {
         String sql = "UPDATE PELICULA SET GENERO = ?, TITULO = ?, DIRECTOR = ?, DURACION = ? WHERE ID = ?";
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = ConexionBD.getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, pelicula.getGenero().name());
             pstmt.setString(2, pelicula.getTitulo());
             pstmt.setString(3, pelicula.getDirector().getNombre());

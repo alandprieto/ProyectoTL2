@@ -56,9 +56,8 @@ public class UsuarioDAOimple implements UsuarioDAO {
     @Override
     public Usuario autenticar(String email, String contrasena) {
         String sql = "SELECT * FROM USUARIO WHERE EMAIL = ? AND CONTRASENA = ?";
-
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = ConexionBD.getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, email);
             pstmt.setString(2, contrasena);
@@ -70,11 +69,15 @@ public class UsuarioDAOimple implements UsuarioDAO {
                     String nombre = rs.getString("NOMBRE");
                     String apellido = rs.getString("APELLIDO");
 
+                    Usuario usuario;
                     if ("ADMIN".equals(rol)) {
-                        return new Administrador(dni, nombre, apellido, email, contrasena);
+                        usuario = new Administrador(dni, nombre, apellido, email, contrasena);
                     } else {
-                        return new Cliente(dni, nombre, apellido, email, contrasena);
+                        usuario = new Cliente(dni, nombre, apellido, email, contrasena);
                     }
+                    // Asignamos el ID de la base de datos al objeto
+                    usuario.setID(rs.getInt("ID"));
+                    return usuario;
                 }
             }
         } catch (SQLException e) {
@@ -88,9 +91,8 @@ public class UsuarioDAOimple implements UsuarioDAO {
     public List<Usuario> listarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
         String sql = "SELECT * FROM USUARIO";
-
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql);
+        Connection conn = ConexionBD.getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
@@ -101,11 +103,14 @@ public class UsuarioDAOimple implements UsuarioDAO {
                 String email = rs.getString("EMAIL");
                 String contrasena = rs.getString("CONTRASENA");
 
+                Usuario usuario;
                 if ("ADMIN".equals(rol)) {
-                    usuarios.add(new Administrador(dni, nombre, apellido, email, contrasena));
+                    usuario = new Administrador(dni, nombre, apellido, email, contrasena);
                 } else {
-                    usuarios.add(new Cliente(dni, nombre, apellido, email, contrasena));
+                    usuario = new Cliente(dni, nombre, apellido, email, contrasena);
                 }
+                usuario.setID(rs.getInt("ID"));
+                usuarios.add(usuario);
             }
         } catch (SQLException e) {
             System.err.println("Error al listar los usuarios: " + e.getMessage());
@@ -116,9 +121,8 @@ public class UsuarioDAOimple implements UsuarioDAO {
     @Override
     public Usuario buscarPorId(int id) {
         String sql = "SELECT * FROM USUARIO WHERE ID = ?";
-
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = ConexionBD.getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
 
@@ -151,9 +155,8 @@ public class UsuarioDAOimple implements UsuarioDAO {
     @Override
     public void eliminar(int idUsuario) {
         String sql = "DELETE FROM USUARIO WHERE ID = ?";
-
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = ConexionBD.getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, idUsuario);
             int filasAfectadas = pstmt.executeUpdate();
@@ -170,9 +173,8 @@ public class UsuarioDAOimple implements UsuarioDAO {
 
     public void actualizar(Usuario usuario) {
         String sql = "UPDATE USUARIO SET DNI = ?, NOMBRE = ?, APELLIDO = ?, EMAIL = ?, CONTRASENA = ?, ROL = ? WHERE ID = ?";
-
-        try (Connection conn = ConexionBD.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = ConexionBD.getConnection();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setLong(1, usuario.getDNI());
             pstmt.setString(2, usuario.getNombre());

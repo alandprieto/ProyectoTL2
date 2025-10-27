@@ -252,7 +252,7 @@ public class AppImple implements IAppServicio {
             }
             System.out.println("Reseñas pendientes:");
             for (Reseña r : reseniasNoAprobadas) {
-                System.out.printf("ID: %d | Usuario ID: %d | Película ID: %d | Comentario: %s | Puntaje: %d\n", r.getID(), r.getUsuario(), r.getIDContenido(), r.getComentario(), r.getCalificacion());
+                System.out.printf("ID: %d | Usuario: %s (ID: %d) | Película ID: %d | Comentario: %s | Puntaje: %d\n", r.getID(), r.getUsuario().getNombre(), r.getUsuario().getID(), r.getIDContenido(), r.getComentario(), r.getCalificacion());
             }
             System.out.print("Ingrese ID de la reseña a aprobar: ");
             int resenaID = Integer.parseInt(scanner.nextLine());
