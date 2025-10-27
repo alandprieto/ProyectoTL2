@@ -6,7 +6,7 @@ public interface IAppServicio {
 
     void registrarCliente(Scanner scanner);
     
-    void registrarAdmin(Scanner scanner);
+    void registrarAdmin(Scanner scanner, String TokenAdm);
     
     void cargarPelicula(Scanner scanner);
     

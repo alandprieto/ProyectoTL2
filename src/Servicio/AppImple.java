@@ -30,7 +30,7 @@ public class AppImple implements IAppServicio {
         ConexionBD.getConnection();
     }
 
-    @Override //no necesario pero la IA me dijo que es una buena implementacion
+    @Override
     public void registrarCliente(Scanner scanner) {
         Boolean firstTime = true;
         Long DNI;
@@ -76,47 +76,56 @@ public class AppImple implements IAppServicio {
     }
     
     @Override
-    public void registrarAdmin(Scanner scanner) {
+    public void registrarAdmin(Scanner scanner, String TokenAdm) {
         Boolean firstTime = true;
-        Long DNI;
-        String nombre;
-        String apellido;
-        String email;
-        String contrasena;
-        do {
-            if (!firstTime) { System.out.println("Error: El DNI debe ser un número válido. Intente de nuevo."); }
-            System.out.print("Ingrese DNI (sin puntos ni comas): ");
-            DNI = Long.parseLong(scanner.nextLine());
-            firstTime = false;
-        } while((DNI <= 0) && (DNI.toString().length() >= 7)); 
-        firstTime = true;
-        do {
-            if (!firstTime) { System.out.println("Error: El nombre solo debe contener letras. Intente de nuevo."); }
-            System.out.print("Ingrese nombre: ");
-            nombre = scanner.nextLine();
-            firstTime = false;
-        } while(!nombre.matches("[a-zA-Z ]+"));
-        firstTime = true;
-        do {
-            if (!firstTime) { System.out.println("Error: El apellido solo debe contener letras. Intente de nuevo."); }
-            System.out.print("Ingrese apellido: ");
-            apellido = scanner.nextLine();
-            firstTime = false;
-        } while(!apellido.matches("[a-zA-Z ]+"));
-        firstTime = true;
-        do {
-            if (!firstTime) { System.out.println("Error: El email debe tener una terminacion valida. Intente de nuevo."); }
-            System.out.print("Ingrese email: ");
-            email = scanner.nextLine();
-            firstTime = false;
-        } while(!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com")));
-        System.out.print("Ingrese contraseña: ");
-        contrasena = scanner.nextLine();
-        Administrador admin = new Administrador(DNI, nombre, apellido, email, contrasena);
-        if (this.usuarioDAO.guardar(admin)) {
-            System.out.println("Administrador registrado exitosamente.");
-        } else {
-            System.out.println("No se pudo registrar al administrador (el email ya podría existir).");
+        System.out.print("Ingrese Token de validacion: ");
+        String TokenValido = scanner.nextLine();
+        if (!TokenValido.equals(TokenAdm)) { 
+            System.out.println("Error: Token no valido"); 
+            return;
+        }
+        else{
+            Long DNI;
+            String nombre;
+            String apellido;
+            String email;
+            String contrasena;
+            firstTime = true;
+            do {
+                if (!firstTime) { System.out.println("Error: El DNI debe ser un número válido. Intente de nuevo."); }
+                System.out.print("Ingrese DNI (sin puntos ni comas): ");
+                DNI = Long.parseLong(scanner.nextLine());
+                firstTime = false;
+            } while((DNI <= 0) && (DNI.toString().length() >= 7)); 
+            firstTime = true;
+            do {
+                if (!firstTime) { System.out.println("Error: El nombre solo debe contener letras. Intente de nuevo."); }
+                System.out.print("Ingrese nombre: ");
+                nombre = scanner.nextLine();
+                firstTime = false;
+            } while(!nombre.matches("[a-zA-Z ]+"));
+            firstTime = true;
+            do {
+                if (!firstTime) { System.out.println("Error: El apellido solo debe contener letras. Intente de nuevo."); }
+                System.out.print("Ingrese apellido: ");
+                apellido = scanner.nextLine();
+                firstTime = false;
+            } while(!apellido.matches("[a-zA-Z ]+"));
+            firstTime = true;
+            do {
+                if (!firstTime) { System.out.println("Error: El email debe tener una terminacion valida. Intente de nuevo."); }
+                System.out.print("Ingrese email: ");
+                email = scanner.nextLine();
+                firstTime = false;
+            } while(!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com")));
+            System.out.print("Ingrese contraseña: ");
+            contrasena = scanner.nextLine();
+            Administrador admin = new Administrador(DNI, nombre, apellido, email, contrasena);
+            if (this.usuarioDAO.guardar(admin)) {
+                System.out.println("Administrador registrado exitosamente.");
+            } else {
+                System.out.println("No se pudo registrar al administrador (el email ya podría existir).");
+            }
         }
     }
 
@@ -252,7 +261,7 @@ public class AppImple implements IAppServicio {
                 return;
             }  
             this.reseñaDAO.guardar(reseña);
-            System.out.println("Reseña registrada exitosamente."); //no muy necesario porque el DAO ya imprime un mensaje de exito, lo dejamos o sacamos?
+            //System.out.println("Reseña registrada exitosamente."); //no muy necesario porque el DAO ya imprime un mensaje de exito, lo dejamos o sacamos?
         }
     }
 
