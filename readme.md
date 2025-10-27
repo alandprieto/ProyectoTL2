@@ -48,15 +48,5 @@ El proyecto sigue una estructura modular básica:
 * `lib/`: (Si aplica) Librerías externas como el driver JDBC de SQLite.
 * `streaming.db`: Archivo de la base de datos SQLite generado en la raíz del proyecto.
 
-## Cómo Ejecutar
-
-1.  Asegúrate de tener Java (JDK) instalado.
-2.  Si se proporciona un archivo `.jar` ejecutable:
-    * Navega hasta la carpeta que contiene el `.jar` en la terminal.
-    * Ejecuta el comando: `java -jar nombre_del_archivo.jar` (reemplaza `nombre_del_archivo.jar` con el nombre real).
-3.  Si se ejecuta desde el código fuente (usando un IDE como VS Code, Eclipse, IntelliJ):
-    * Importa el proyecto en tu IDE.
-    * Asegúrate de que la librería JDBC de SQLite esté correctamente configurada en el classpath del proyecto (si no está incluida).
-    * Ejecuta la clase `Control.App`.
 
 La aplicación mostrará un menú en la consola para interactuar con las funcionalidades implementadas. La base de datos (`streaming.db`) se creará automáticamente en el directorio raíz del proyecto la primera vez que se ejecute la aplicación.

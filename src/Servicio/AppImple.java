@@ -32,52 +32,20 @@ public class AppImple implements IAppServicio {
 
     @Override
     public void registrarCliente(Scanner scanner) {
-        Boolean firstTime = true;
-        Long DNI;
-        String nombre;
-        String apellido;
-        String email;
-        String contrasena;
-        do {
-            if (!firstTime) { System.out.println("Error: El DNI debe ser un número válido. Intente de nuevo."); }
-            System.out.print("Ingrese DNI (sin puntos ni comas): ");
-            DNI = Long.parseLong(scanner.nextLine());
-            firstTime = false;
-        } while((DNI <= 0) && (DNI.toString().length() >= 7)); 
-        firstTime = true;
-        do {
-            if (!firstTime) { System.out.println("Error: El nombre solo debe contener letras. Intente de nuevo."); }
-            System.out.print("Ingrese nombre: ");
-            nombre = scanner.nextLine();
-            firstTime = false;
-        } while(!nombre.matches("[a-zA-Z ]+")); 
-        firstTime = true;
-        do {
-            if (!firstTime) { System.out.println("Error: El apellido solo debe contener letras. Intente de nuevo."); }
-            System.out.print("Ingrese apellido: ");
-            apellido = scanner.nextLine();
-            firstTime = false;
-        } while(!apellido.matches("[a-zA-Z ]+")); 
-        firstTime = true;
-        do {
-            if (!firstTime) { System.out.println("Error: El email debe tener una terminacion valida. Intente de nuevo."); }
-            System.out.print("Ingrese email: ");
-            email = scanner.nextLine();
-            firstTime = false;
-        } while(!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com") || email.endsWith("@yahoo.com"))); 
-        System.out.print("Ingrese contrasena: ");
-        contrasena = scanner.nextLine();
-        Cliente cliente = new Cliente(DNI, nombre, apellido, email, contrasena);
+        System.out.println("\n--- Registro de Nuevo Cliente ---");
+        Usuario datosUsuario = solicitarDatosUsuario(scanner);
+        if (datosUsuario == null) return; // El usuario canceló o hubo un error
+
+        Cliente cliente = new Cliente(datosUsuario.getDNI(), datosUsuario.getNombre(), datosUsuario.getApellido(), datosUsuario.getEmail(), datosUsuario.getContrasena());
         if (this.usuarioDAO.guardar(cliente)) {
             System.out.println("Cliente registrado exitosamente.");
         } else {
             System.out.println("No se pudo registrar al cliente (el email ya podría existir).");
         }
     }
-    
+
     @Override
     public void registrarAdmin(Scanner scanner, String TokenAdm) {
-        Boolean firstTime = true;
         System.out.print("Ingrese Token de validacion: ");
         String TokenValido = scanner.nextLine();
         if (!TokenValido.equals(TokenAdm)) { 
@@ -85,42 +53,11 @@ public class AppImple implements IAppServicio {
             return;
         }
         else{
-            Long DNI;
-            String nombre;
-            String apellido;
-            String email;
-            String contrasena;
-            firstTime = true;
-            do {
-                if (!firstTime) { System.out.println("Error: El DNI debe ser un número válido. Intente de nuevo."); }
-                System.out.print("Ingrese DNI (sin puntos ni comas): ");
-                DNI = Long.parseLong(scanner.nextLine());
-                firstTime = false;
-            } while((DNI <= 0) && (DNI.toString().length() >= 7)); 
-            firstTime = true;
-            do {
-                if (!firstTime) { System.out.println("Error: El nombre solo debe contener letras. Intente de nuevo."); }
-                System.out.print("Ingrese nombre: ");
-                nombre = scanner.nextLine();
-                firstTime = false;
-            } while(!nombre.matches("[a-zA-Z ]+"));
-            firstTime = true;
-            do {
-                if (!firstTime) { System.out.println("Error: El apellido solo debe contener letras. Intente de nuevo."); }
-                System.out.print("Ingrese apellido: ");
-                apellido = scanner.nextLine();
-                firstTime = false;
-            } while(!apellido.matches("[a-zA-Z ]+"));
-            firstTime = true;
-            do {
-                if (!firstTime) { System.out.println("Error: El email debe tener una terminacion valida. Intente de nuevo."); }
-                System.out.print("Ingrese email: ");
-                email = scanner.nextLine();
-                firstTime = false;
-            } while(!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com")));
-            System.out.print("Ingrese contraseña: ");
-            contrasena = scanner.nextLine();
-            Administrador admin = new Administrador(DNI, nombre, apellido, email, contrasena);
+            System.out.println("\n--- Registro de Nuevo Administrador ---");
+            Usuario datosUsuario = solicitarDatosUsuario(scanner);
+            if (datosUsuario == null) return;
+
+            Administrador admin = new Administrador(datosUsuario.getDNI(), datosUsuario.getNombre(), datosUsuario.getApellido(), datosUsuario.getEmail(), datosUsuario.getContrasena());
             if (this.usuarioDAO.guardar(admin)) {
                 System.out.println("Administrador registrado exitosamente.");
             } else {
@@ -129,20 +66,64 @@ public class AppImple implements IAppServicio {
         }
     }
 
+    private Usuario solicitarDatosUsuario(Scanner scanner) {
+        long DNI = 0;
+        while (true) {
+            System.out.print("Ingrese DNI (sin puntos ni comas): ");
+            try {
+                DNI = Long.parseLong(scanner.nextLine());
+                String dniStr = String.valueOf(DNI);
+                if (DNI > 0 && dniStr.length() >= 7 && dniStr.length() <= 8) {
+                    break;
+                }
+                System.out.println("Error: El DNI debe ser un número positivo de 7 u 8 dígitos.");
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Por favor, ingrese un número válido para el DNI.");
+            }
+        }
+
+        String nombre;
+        do {
+            System.out.print("Ingrese nombre: ");
+            nombre = scanner.nextLine();
+            if (!nombre.matches("[a-zA-Z ]+")) {
+                System.out.println("Error: El nombre solo debe contener letras y espacios.");
+            }
+        } while (!nombre.matches("[a-zA-Z ]+"));
+
+        String apellido;
+        do {
+            System.out.print("Ingrese apellido: ");
+            apellido = scanner.nextLine();
+            if (!apellido.matches("[a-zA-Z ]+")) {
+                System.out.println("Error: El apellido solo debe contener letras y espacios.");
+            }
+        } while (!apellido.matches("[a-zA-Z ]+"));
+
+        String email;
+        do {
+            System.out.print("Ingrese email: ");
+            email = scanner.nextLine();
+            if (!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com") || email.endsWith("@yahoo.com"))) {
+                System.out.println("Error: El email debe tener una terminación válida (@gmail, @hotmail, @outlook, @yahoo).");
+            }
+        } while (!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com") || email.endsWith("@yahoo.com")));
+
+        System.out.print("Ingrese contraseña: ");
+        String contrasena = scanner.nextLine();
+
+        // Devolvemos un objeto temporal solo para transportar los datos
+        return new Cliente(DNI, nombre, apellido, email, contrasena);
+    }
+
     @Override
     public void cargarPelicula(Scanner scanner) {
-        System.out.println("\n--- Autenticación de Administrador Requerida ---");
-        System.out.print("Ingrese su email de administrador: ");
-        String email = scanner.nextLine();
-        System.out.print("Ingrese su contraseña: ");
-        String contrasena = scanner.nextLine();
-        Usuario usuario = this.usuarioDAO.autenticar(email, contrasena);
-        if (!(usuario instanceof Administrador) || usuario == null) {
-            System.out.println("Error: Solo los administradores pueden cargar películas.");
-            return;
-        } else {
-            System.out.println("Autenticación exitosa. Puede proceder a cargar la película.");
-            System.out.println();
+        Usuario admin = autenticarUsuarioPorRol(scanner, Administrador.class);
+        if (admin == null) {
+            return; // La autenticación falló, el mensaje de error ya se mostró.
+        }
+
+        System.out.println("\n--- Carga de Nueva Película ---");
             System.out.print("Ingrese título de la película: ");
             String titulo = scanner.nextLine();
             System.out.print("Ingrese género (1: ACCION, 2: COMEDIA, 3: DRAMA, 4: CIENCIA_FICCION): ");
@@ -162,7 +143,6 @@ public class AppImple implements IAppServicio {
                 return;
             }
             this.peliculaDAO.guardar(pelicula);
-        }
     }
 
     @Override
@@ -216,18 +196,12 @@ public class AppImple implements IAppServicio {
 
     @Override
     public void registrarResena(Scanner scanner) {
-        System.out.println("\n--- Autenticación de Usuario Requerida ---");
-        System.out.print("Ingrese su email: ");
-        String email = scanner.nextLine();
-        System.out.print("Ingrese su contraseña: ");
-        String contrasena = scanner.nextLine();
-        Usuario usuario = this.usuarioDAO.autenticar(email, contrasena);
-        if (!(usuario instanceof Cliente) || usuario == null) {
-            System.out.println("Error: Solo los clientes pueden registrar reseñas.");
-            return;
-        } else {
-            System.out.println("Autenticación exitosa. Puede proceder a registrar la reseña.");
-            System.out.println("\n--- Películas Disponibles para Reseñar ---");
+        Usuario usuario = autenticarUsuarioPorRol(scanner, Cliente.class);
+        if (usuario == null) {
+            return; // La autenticación falló.
+        }
+
+        System.out.println("\n--- Registro de Nueva Reseña ---");
             List<Pelicula> peliculas = this.peliculaDAO.listarTodas();
             if (peliculas.isEmpty()) {
                 System.out.println("No hay películas cargadas en el sistema.");
@@ -261,34 +235,46 @@ public class AppImple implements IAppServicio {
                 return;
             }  
             this.reseñaDAO.guardar(reseña);
-            //System.out.println("Reseña registrada exitosamente."); //no muy necesario porque el DAO ya imprime un mensaje de exito, lo dejamos o sacamos?
-        }
     }
 
     @Override
     public void aprobarResena(Scanner scanner) {
-        System.out.println("\n--- Autenticación de Administrador Requerida ---");
-        System.out.print("Ingrese su email de administrador: ");
-        String email = scanner.nextLine();
-        System.out.print("Ingrese su contraseña: ");
-        String contrasena = scanner.nextLine();
-        Usuario usuario = this.usuarioDAO.autenticar(email, contrasena);
-        if (!(usuario instanceof Administrador) || usuario == null) {
-            System.out.println("Error: Solo los administradores pueden aprobar reseñas");
-            return;
-        } else {
-            System.out.println("Autenticación exitosa. Puede proceder a aprobar reseñas.");
+        Usuario admin = autenticarUsuarioPorRol(scanner, Administrador.class);
+        if (admin == null) {
+            return; // La autenticación falló.
+        }
+
+        System.out.println("\n--- Aprobación de Reseñas ---");
             List<Reseña> reseniasNoAprobadas = this.reseñaDAO.listarNoAprobadas();
             if (reseniasNoAprobadas.isEmpty()) {
                 System.out.println("No hay reseñas pendientes de aprobación.");
                 return;
             }
+            System.out.println("Reseñas pendientes:");
             for (Reseña r : reseniasNoAprobadas) {
                 System.out.printf("ID: %d | Usuario ID: %d | Película ID: %d | Comentario: %s | Puntaje: %d\n", r.getID(), r.getUsuario(), r.getIDContenido(), r.getComentario(), r.getCalificacion());
             }
             System.out.print("Ingrese ID de la reseña a aprobar: ");
             int resenaID = Integer.parseInt(scanner.nextLine());
             this.reseñaDAO.aprobarResenia(resenaID);
+    }
+
+    private Usuario autenticarUsuarioPorRol(Scanner scanner, Class<? extends Usuario> tipoUsuarioEsperado) {
+        System.out.println("\n--- Autenticación de Usuario Requerida ---");
+        System.out.print("Ingrese su email: ");
+        String email = scanner.nextLine();
+        System.out.print("Ingrese su contraseña: ");
+        String contrasena = scanner.nextLine();
+        Usuario usuario = this.usuarioDAO.autenticar(email, contrasena);
+        if (usuario == null) {
+            System.out.println("Error: Credenciales incorrectas.");
+            return null;
         }
+        if (!tipoUsuarioEsperado.isInstance(usuario)) {
+            System.out.println("Error: Permisos insuficientes para esta acción.");
+            return null;
+        }
+        System.out.println("Autenticación exitosa. ¡Bienvenido, " + usuario.getNombre() + "!");
+        return usuario;
     }
 }
