@@ -7,26 +7,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ConexionBD {
-
-    // Define el nombre del archivo de la base de datos. Se creará en la raíz del proyecto.
     private static final String URL_SQLITE = "jdbc:sqlite:streaming.db";
     private static Connection connection = null;
 
-    /**
-     * Constructor privado para evitar que se creen instancias de esta clase.
-     */
-    private ConexionBD() {}
+    private ConexionBD() {
+    }
 
-    /**
-     * Obtiene una conexión a la base de datos. Si no existe, la crea.
-     */
     public static Connection getConnection() {
         if (connection == null) {
             try {
                 connection = DriverManager.getConnection(URL_SQLITE);
                 System.out.println("Conexión a SQLite establecida con éxito.");
                 creacionDeTablasEnBD(connection);
-                cargarDatosIniciales(connection); // Cargar datos de prueba si la BD está vacía
+                cargarDatosIniciales(connection); 
             } catch (SQLException e) {
                 System.err.println("Error al conectar con la base de datos: " + e.getMessage());
                 return null;
@@ -35,9 +28,6 @@ public class ConexionBD {
         return connection;
     }
 
-    /**
-     * Cierra la conexión a la base de datos si está abierta.
-     */
     public static void cerrarConexion() {
         if (connection != null) {
             try {
@@ -92,11 +82,9 @@ public class ConexionBD {
 
     private static void cargarDatosIniciales(Connection conn) throws SQLException {
         try (Statement stmt = conn.createStatement()) {
-            // Verificar si la tabla de usuarios ya tiene datos
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM USUARIO");
             if (rs.next() && rs.getInt(1) > 0) {
-                // System.out.println("La base de datos ya contiene datos. No se cargarán datos iniciales.");
-                return; // Salir si ya hay usuarios
+                return; 
             }
 
             System.out.println("Base de datos vacía. Cargando datos iniciales...");

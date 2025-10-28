@@ -34,7 +34,7 @@ public class AppImple implements IAppServicio {
     public void registrarCliente(Scanner scanner) {
         System.out.println("\n--- Registro de Nuevo Cliente ---");
         Usuario datosUsuario = solicitarDatosUsuario(scanner);
-        if (datosUsuario == null) return; // El usuario canceló o hubo un error
+        if (datosUsuario == null) return;
 
         Cliente cliente = new Cliente(datosUsuario.getDNI(), datosUsuario.getNombre(), datosUsuario.getApellido(), datosUsuario.getEmail(), datosUsuario.getContrasena());
         if (this.usuarioDAO.guardar(cliente)) {
@@ -112,7 +112,6 @@ public class AppImple implements IAppServicio {
         System.out.print("Ingrese contraseña: ");
         String contrasena = scanner.nextLine();
 
-        // Devolvemos un objeto temporal solo para transportar los datos
         return new Cliente(DNI, nombre, apellido, email, contrasena);
     }
 
@@ -120,7 +119,7 @@ public class AppImple implements IAppServicio {
     public void cargarPelicula(Scanner scanner) {
         Usuario admin = autenticarUsuarioPorRol(scanner, Administrador.class);
         if (admin == null) {
-            return; // La autenticación falló, el mensaje de error ya se mostró.
+            return; 
         }
 
         System.out.println("\n--- Carga de Nueva Película ---");
@@ -198,7 +197,7 @@ public class AppImple implements IAppServicio {
     public void registrarResena(Scanner scanner) {
         Usuario usuario = autenticarUsuarioPorRol(scanner, Cliente.class);
         if (usuario == null) {
-            return; // La autenticación falló.
+            return; 
         }
 
         System.out.println("\n--- Registro de Nueva Reseña ---");
@@ -241,7 +240,7 @@ public class AppImple implements IAppServicio {
     public void aprobarResena(Scanner scanner) {
         Usuario admin = autenticarUsuarioPorRol(scanner, Administrador.class);
         if (admin == null) {
-            return; // La autenticación falló.
+            return; 
         }
 
         System.out.println("\n--- Aprobación de Reseñas ---");

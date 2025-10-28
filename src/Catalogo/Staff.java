@@ -2,7 +2,7 @@ package Catalogo;
 
 public class Staff {
     private String nombre;
-    private String rol; // Ejemplo: Actor, Director, Guionista, etc.
+    private String rol; 
 
     public Staff(String nombre, String rol) {
         this.nombre = nombre;

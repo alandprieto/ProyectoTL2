@@ -26,7 +26,6 @@ public class UsuarioDAOimple implements UsuarioDAO {
             pstmt.setString(4, usuario.getEmail());
             pstmt.setString(5, usuario.getContrasena());
 
-            // Determina el rol basado en la clase del objeto
             if (usuario instanceof Administrador) {
                 pstmt.setString(6, "ADMIN");
             } else {
@@ -75,7 +74,6 @@ public class UsuarioDAOimple implements UsuarioDAO {
                     } else {
                         usuario = new Cliente(dni, nombre, apellido, email, contrasena);
                     }
-                    // Asignamos el ID de la base de datos al objeto
                     usuario.setID(rs.getInt("ID"));
                     return usuario;
                 }
@@ -84,7 +82,7 @@ public class UsuarioDAOimple implements UsuarioDAO {
             System.err.println("Error de autenticación: " + e.getMessage());
         }
 
-        return null; // Credenciales incorrectas o error
+        return null; 
     }
 
     @Override
@@ -149,7 +147,7 @@ public class UsuarioDAOimple implements UsuarioDAO {
             System.err.println("Error al buscar el usuario por ID: " + e.getMessage());
         }
 
-        return null; // Usuario no encontrado o error
+        return null; 
     }
 
     @Override

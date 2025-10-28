@@ -9,11 +9,10 @@ Este proyecto corresponde al Entregable 2 del Taller de Lenguajes II (2025). Es 
 Durante el desarrollo, se tomaron ciertas interpretaciones y decisiones de diseño basadas en los requisitos y las dudas surgidas:
 
 1.  **Modelo de Base de Datos:**
-    * Se optó por **simplificar el esquema** propuesto en el diagrama Entidad-Relación del PDF. La tabla `DATOS_PERSONALES` fue **integrada directamente en la tabla `USUARIO`**, incluyendo las columnas `DNI`, `NOMBRE` y `APELLIDO`. Esto difiere del diagrama y los primeros *snippets* SQL del PDF.
+    * Se optó por **simplificar el esquema** propuesto en el diagrama Entidad-Relación del PDF. La tabla `DATOS_PERSONALES` fue **integrada directamente en la tabla `USUARIO`**, incluyendo las columnas `DNI`, `NOMBRE` y `APELLIDO`. Esto difiere del diagrama y los primeros codigos SQL del PDF.
     * La tabla `USUARIO` **no incluye** el campo `NOMBRE_USUARIO` sugerido en el PDF, utilizando en su lugar `NOMBRE` y `APELLIDO`. Se añadió una columna `ROL` ("CLIENTE" o "ADMIN") para diferenciar los tipos de usuario.
-    * La tabla `PELICULA` utiliza `GENERO TEXT(50)` y `DURACION INTEGER` (representando minutos) en lugar de `TEXT(1)` y `REAL` respectivamente, como se veía en los *snippets* del PDF. El campo `RESUMEN`, aunque opcional según el PDF, se omitió completamente en la tabla y la clase `Pelicula`.
-    * La tabla `RESENIA` establece el valor por defecto del campo `APROBADO` en `0` (no aprobado), a diferencia del `1` en el *snippet* del PDF. Las claves foráneas `ID_USUARIO` y `ID_PELICULA` se implementaron correctamente.
-    * Se infiere que los *snippets* SQL del PDF podrían estar desactualizados o ser solo ejemplos iniciales, dada las diferencias con la implementación final en `ConexionBD.java`.
+    * La tabla `PELICULA` utiliza `GENERO TEXT(50)` y `DURACION INTEGER` (representando minutos) en lugar de `TEXT(1)` y `REAL` respectivamente, como se veía en los codigos del PDF. El campo `RESUMEN`, aunque opcional según el PDF, se omitió completamente en la tabla y la clase `Pelicula`.
+    * La tabla `RESENIA` establece el valor por defecto del campo `APROBADO` en `0` (no aprobado), a diferencia del `1` en el codigo del PDF. Las claves foráneas `ID_USUARIO` y `ID_PELICULA` se implementaron correctamente.
 
 2.  **Registro de Usuarios y Datos Personales:**
     * Debido a la fusión de `DATOS_PERSONALES` en `USUARIO`, el flujo de registro descripto en el PDF (primero datos personales, luego usuario) se **combinó en un solo paso** para cada tipo de usuario (`registrarCliente` y `registrarAdmin`).
@@ -32,6 +31,16 @@ Durante el desarrollo, se tomaron ciertas interpretaciones y decisiones de dise�
 6.  **Otros:**
     * La fecha y hora (`FECHA_HORA`) en `RESENIA` se almacena como texto en formato ISO.
     * Los listados ordenados solicitados se implementaron usando `Comparator` de Java.
+
+7.  **Precarga de Datos:**
+    * Para facilitar las pruebas y la demostración, la aplicación **precarga un conjunto de datos iniciales** la primera vez que se ejecuta y detecta que la base de datos está vacía.
+    * **Datos precargados:**
+        * **Usuarios:** Se cargan 5 usuarios: 2 con rol de `ADMIN` y 3 con rol de `CLIENTE`.
+            * **Admin 1:** `admin1@streaming.com` / `admin123`
+            * **Cliente 1:** `carlos@gmail.com` / `pass123`
+        * **Películas:** Se cargan 5 películas de diferentes géneros, como "Inception", "The Dark Knight" y "The Matrix".
+        * **Reseñas:** Se cargan 5 reseñas de ejemplo, algunas ya aprobadas y otras pendientes de aprobación, para permitir probar ambas funcionalidades.
+
 
 ## Estructura del Proyecto
 

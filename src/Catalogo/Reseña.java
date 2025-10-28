@@ -5,9 +5,9 @@ import Usuario.Usuario;
 public class Reseña {
     private int ID;
     private String comentario;
-    private int calificacion; // Calificacion del 1 al 5
-    private Usuario usuario; // Usuario que hizo la reseña
-    private int IDContenido; // ID del contenido reseñado
+    private int calificacion; 
+    private Usuario usuario; 
+    private int IDContenido;
 
     public Reseña() { }
 

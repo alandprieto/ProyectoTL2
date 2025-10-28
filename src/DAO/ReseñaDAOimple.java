@@ -28,7 +28,6 @@ public class ReseñaDAOimple implements ReseñaDAO {
             // Guardamos la fecha y hora actual en formato de texto estándar
             pstmt.setString(3, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
-            // Obtenemos los IDs directamente del objeto Reseña
             pstmt.setInt(4, resenia.getUsuario().getID());
             pstmt.setInt(5, resenia.getIDContenido());
 
