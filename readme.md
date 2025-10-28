@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-Este proyecto corresponde al Entregable 2 del Taller de Lenguajes II (2025). Es una prueba de concepto (POC) enfocada en la persistencia de objetos en una base de datos SQLite. Implementa una sección del modelo de clases de una plataforma de streaming, permitiendo gestionar Usuarios (Clientes y Administradores), Películas y Reseñas a través de una aplicación de consola. Se utiliza el patrón DAO para el acceso a datos.
+Este proyecto corresponde al Entregable 2 del Taller de Lenguajes II (2025). Es una prueba de concepto enfocada en la carga, lectura y actualizacion de datos en una base de datos SQLite y su implementacion en los metodos correspondientes de cada clase. Implementa una sección del modelo de clases de una plataforma de streaming, permitiendo gestionar Usuarios (Clientes y Administradores), Películas y Reseñas a través de una aplicación de consola. Se utiliza el patrón DAO para el acceso a datos.
 
 ## Aclaraciones sobre Interpretaciones y Diseño
 
@@ -16,13 +16,13 @@ Durante el desarrollo, se tomaron ciertas interpretaciones y decisiones de dise�
 
 2.  **Registro de Usuarios y Datos Personales:**
     * Debido a la fusión de `DATOS_PERSONALES` en `USUARIO`, el flujo de registro descripto en el PDF (primero datos personales, luego usuario) se **combinó en un solo paso** para cada tipo de usuario (`registrarCliente` y `registrarAdmin`).
-    * **No se implementó** la funcionalidad o el atributo `Domicilio` para la clase `Cliente` (mencionado como código comentado en `Cliente.java` y como duda en `Dudas Entregable2.txt`). Por lo tanto, ni Clientes ni Administradores manejan información de domicilio en esta implementación.
+    * **No se implementó** la funcionalidad o el atributo `Domicilio` para la clase `Cliente` (mencionado como código comentado en `Cliente.java`). Por lo tanto, ni Clientes ni Administradores manejan información de domicilio en esta implementación, fue comentado en caso de necesitarlo para futuras entregas.
 
 3.  **Validación de Administrador:**
     * Aunque el PDF no lo especificaba explícitamente, se implementó una **validación mediante un token** (`TokenAdm`) para el registro de nuevos Administradores como medida de seguridad.
 
 4.  **Clases del Modelo:**
-    * La clase `Staff` se mantuvo simple, conteniendo solo `nombre` y `rol`, utilizada principalmente para el `director` de la `Pelicula`. La lista `elenco` fue comentada en `Contenido.java`.
+    * La clase `Staff` se mantuvo simple, conteniendo solo `nombre` y `rol`, utilizada principalmente para el `director` de la `Pelicula`. La lista `elenco` fue comentada en `Contenido.java` ya que no se necesito su implementacion para este entregable, sin embargo, es considerada para futuros casos.
     * Se utilizó un enumerativo `GeneroPelicula` para el campo `GENERO` de `Pelicula`, tal como se requería.
 
 5.  **Validaciones Específicas:**
