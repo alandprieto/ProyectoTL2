@@ -201,39 +201,39 @@ public class AppImple implements IAppServicio {
         }
 
         System.out.println("\n--- Registro de Nueva Reseña ---");
-            List<Pelicula> peliculas = this.peliculaDAO.listarTodas();
-            if (peliculas.isEmpty()) {
-                System.out.println("No hay películas cargadas en el sistema.");
-                return;
+        List<Pelicula> peliculas = this.peliculaDAO.listarTodas();
+        if (peliculas.isEmpty()) {
+            System.out.println("No hay películas cargadas en el sistema.");
+            return;
+        }
+        for (Pelicula p : peliculas) {
+            System.out.printf("ID: %d - Título: %s\n", p.getID(), p.getTitulo());
+        }
+        int peliculaID;
+        do {
+            System.out.print("Ingrese un ID de pelicula valido para resenar: ");
+            peliculaID = Integer.parseInt(scanner.nextLine());
+        } while (!this.peliculaDAO.existePelicula(peliculaID));
+        System.out.print("Ingrese comentario: ");
+        String comentario = scanner.nextLine();
+        int puntaje;
+        do {
+            System.out.print("Ingrese puntaje (1-5): ");
+            puntaje = Integer.parseInt(scanner.nextLine());
+            if (puntaje < 1 || puntaje > 5) {
+                System.out.println("Error: El puntaje debe ser un número entre 1 y 5.");
             }
-            for (Pelicula p : peliculas) {
-                System.out.printf("ID: %d - Título: %s\n", p.getID(), p.getTitulo());
-            }
-            int peliculaID;
-            do {
-                System.out.print("Ingrese un ID de pelicula valido para resenar: ");
-                peliculaID = Integer.parseInt(scanner.nextLine());
-            } while (!this.peliculaDAO.existePelicula(peliculaID));
-            System.out.print("Ingrese comentario: ");
-            String comentario = scanner.nextLine();
-            int puntaje;
-            do {
-                System.out.print("Ingrese puntaje (1-5): ");
-                puntaje = Integer.parseInt(scanner.nextLine());
-                if (puntaje < 1 || puntaje > 5) {
-                    System.out.println("Error: El puntaje debe ser un número entre 1 y 5.");
-                }
-            } while (puntaje < 1 || puntaje > 5);
-            Reseña reseña = new Reseña(usuario, peliculaID, comentario, puntaje);
-            System.out.println("Reseña a registrar:");
-            System.out.printf("ID: %d | Usuario ID: %d | Película ID: %d | Comentario: %s | Puntaje: %d\n", reseña.getID(), reseña.getUsuario(), reseña.getIDContenido(), reseña.getComentario(), reseña.getCalificacion());
-            System.out.println("¿La Reseña es correcta? [Y/N] ");
-            String confirmacion = scanner.nextLine().trim().toUpperCase();
-            if (!confirmacion.equals("Y")) {
-                System.out.println("Operación cancelada. La reseña no fue registrada.");
-                return;
-            }  
-            this.reseñaDAO.guardar(reseña);
+        } while (puntaje < 1 || puntaje > 5);
+        Reseña reseña = new Reseña(usuario, peliculaID, comentario, puntaje);
+        System.out.println("Reseña a registrar:");
+        System.out.printf("ID: %d | Usuario ID: %d | Película ID: %d | Comentario: %s | Puntaje: %d\n", reseña.getID(), reseña.getUsuario(), reseña.getIDContenido(), reseña.getComentario(), reseña.getCalificacion());
+        System.out.println("¿La Reseña es correcta? [Y/N] ");
+        String confirmacion = scanner.nextLine().trim().toUpperCase();
+        if (!confirmacion.equals("Y")) {
+            System.out.println("Operación cancelada. La reseña no fue registrada.");
+            return;
+        }  
+        this.reseñaDAO.guardar(reseña);
     }
 
     @Override
@@ -244,18 +244,18 @@ public class AppImple implements IAppServicio {
         }
 
         System.out.println("\n--- Aprobación de Reseñas ---");
-            List<Reseña> reseniasNoAprobadas = this.reseñaDAO.listarNoAprobadas();
-            if (reseniasNoAprobadas.isEmpty()) {
-                System.out.println("No hay reseñas pendientes de aprobación.");
-                return;
-            }
-            System.out.println("Reseñas pendientes:");
-            for (Reseña r : reseniasNoAprobadas) {
-                System.out.printf("ID: %d | Usuario: %s (ID: %d) | Película ID: %d | Comentario: %s | Puntaje: %d\n", r.getID(), r.getUsuario().getNombre(), r.getUsuario().getID(), r.getIDContenido(), r.getComentario(), r.getCalificacion());
-            }
-            System.out.print("Ingrese ID de la reseña a aprobar: ");
-            int resenaID = Integer.parseInt(scanner.nextLine());
-            this.reseñaDAO.aprobarResenia(resenaID);
+        List<Reseña> reseniasNoAprobadas = this.reseñaDAO.listarNoAprobadas();
+        if (reseniasNoAprobadas.isEmpty()) {
+            System.out.println("No hay reseñas pendientes de aprobación.");
+            return;
+        }
+        System.out.println("Reseñas pendientes:");
+        for (Reseña r : reseniasNoAprobadas) {
+            System.out.printf("ID: %d | Usuario: %s (ID: %d) | Película ID: %d | Comentario: %s | Puntaje: %d\n", r.getID(), r.getUsuario().getNombre(), r.getUsuario().getID(), r.getIDContenido(), r.getComentario(), r.getCalificacion());
+        }
+        System.out.print("Ingrese ID de la reseña a aprobar: ");
+        int resenaID = Integer.parseInt(scanner.nextLine());
+        this.reseñaDAO.aprobarResenia(resenaID);
     }
 
     private Usuario autenticarUsuarioPorRol(Scanner scanner, Class<? extends Usuario> tipoUsuarioEsperado) {

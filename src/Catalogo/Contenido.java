@@ -10,7 +10,7 @@ public abstract class Contenido {
     private GeneroPelicula genero;
     private String sinopsis;
     private Staff director;
-    private double puntaje; 
+    private double puntaje;
     private int vistas;
     private Path video;
     private List<Reseña> reseñas;
@@ -51,7 +51,17 @@ public abstract class Contenido {
     // public void setSubtitulosDisponibles(List<Subtitulos> subtitulosDisponibles) { this.subtitulosDisponibles = subtitulosDisponibles; }
 
     public double getPuntaje() { return puntaje; }
-    public void setPuntaje(double puntaje) { this.puntaje = puntaje; }
+    public void setPuntaje() {
+        if (reseñas == null || reseñas.isEmpty()) {
+            this.puntaje = 0.0;
+            return;
+        }
+        double sum = 0;
+        for (Reseña reseña : reseñas) {
+            sum += reseña.getCalificacion();
+        }
+        this.puntaje = sum / reseñas.size();
+    }
 
     public int getVistas() { return vistas; }
     public void setVistas(int vistas) { this.vistas = vistas; }
@@ -67,8 +77,5 @@ public abstract class Contenido {
 
     public int getID() { return ID; }
     public void setID(int iD) { ID = iD; }
-
-    public double obtenerPuntaje() { return puntaje; }
     
-    // public Reseña obtenerReseña(Reseña r) { /* implementación */ return null; }
 }

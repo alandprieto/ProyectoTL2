@@ -11,7 +11,6 @@ public class Pelicula extends Contenido {
     private Duration duracion;
 
     public Pelicula(String titulo, GeneroPelicula genero, String sinopsis, Staff director, double puntaje, int vistas, Path video, List<Reseña> reseñas, int ID, Duration duracion) {
-
         super(titulo, genero, sinopsis, director, puntaje, vistas, video, reseñas, ID);
         this.duracion = duracion;
     }
