@@ -4,14 +4,19 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+
 import Catalogo.Pelicula;
 import Catalogo.Reseña;
 import Catalogo.Staff;
+
 import ENUM.GeneroPelicula;
+
 import Usuario.Administrador;
 import Usuario.Cliente;
 import Usuario.Usuario;
+
 import DataBase.ConexionBD;
+
 import DAO.PeliculaDAO;
 import DAO.ReseñaDAO;
 import DAO.UsuarioDAO;
@@ -123,25 +128,25 @@ public class AppImple implements IAppServicio {
         }
 
         System.out.println("\n--- Carga de Nueva Película ---");
-            System.out.print("Ingrese título de la película: ");
-            String titulo = scanner.nextLine();
-            System.out.print("Ingrese género (1: ACCION, 2: COMEDIA, 3: DRAMA, 4: CIENCIA_FICCION): ");
-            int generoInput = Integer.parseInt(scanner.nextLine());
-            System.out.print("Ingrese nombre del director: ");
-            String directorNombre = scanner.nextLine();
-            Staff director = new Staff(directorNombre, "Director");
-            GeneroPelicula genero = GeneroPelicula.values()[generoInput - 1];
-            System.out.print("Ingrese duración en minutos: ");
-            Duration duracion = Duration.ofMinutes(Integer.parseInt(scanner.nextLine()));
-            Pelicula pelicula = new Pelicula(titulo, genero, "", director, 0.0, 0, null, null, 0, duracion);
-            System.out.printf("Titulo: %s | Género: %s | Director: %s | Duración: %d min\n", pelicula.getTitulo(), pelicula.getGenero(), pelicula.getDirector().getNombre(), pelicula.getDuracion().toMinutes());
-            System.out.println("¿La Película es correcta? [Y/N] "); 
-            String confirmacion = scanner.nextLine().trim().toUpperCase();
-            if (!confirmacion.equals("Y")) {
-                System.out.println("Operación cancelada. La película no fue cargada.");
-                return;
-            }
-            this.peliculaDAO.guardar(pelicula);
+        System.out.print("Ingrese título de la película: ");
+        String titulo = scanner.nextLine();
+        System.out.print("Ingrese género (1: ACCION, 2: COMEDIA, 3: DRAMA, 4: CIENCIA_FICCION): ");
+        int generoInput = Integer.parseInt(scanner.nextLine());
+        System.out.print("Ingrese nombre del director: ");
+        String directorNombre = scanner.nextLine();
+        Staff director = new Staff(directorNombre, "Director");
+        GeneroPelicula genero = GeneroPelicula.values()[generoInput - 1];
+        System.out.print("Ingrese duración en minutos: ");
+        Duration duracion = Duration.ofMinutes(Integer.parseInt(scanner.nextLine()));
+        Pelicula pelicula = new Pelicula(titulo, genero, "", director, 0.0, 0, null, null, 0, duracion);
+        System.out.printf("Titulo: %s | Género: %s | Director: %s | Duración: %d min\n", pelicula.getTitulo(), pelicula.getGenero(), pelicula.getDirector().getNombre(), pelicula.getDuracion().toMinutes());
+        System.out.println("¿La Película es correcta? [Y/N] "); 
+        String confirmacion = scanner.nextLine().trim().toUpperCase();
+        if (!confirmacion.equals("Y")) {
+            System.out.println("Operación cancelada. La película no fue cargada.");
+            return;
+        }
+        this.peliculaDAO.guardar(pelicula);
     }
 
     @Override
@@ -232,7 +237,7 @@ public class AppImple implements IAppServicio {
         if (!confirmacion.equals("Y")) {
             System.out.println("Operación cancelada. La reseña no fue registrada.");
             return;
-        }  
+        }
         this.reseñaDAO.guardar(reseña);
     }
 
