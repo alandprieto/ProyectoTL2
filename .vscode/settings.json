@@ -3,6 +3,6 @@
         "src"
     ],
     "java.project.referencedLibraries": [
-        "/media/alandprieto/Facultad/2do Semestre 2025/TL2/sqlite-jdbc-3.50.3.0.jar"
+        "lib/**/*.jar"
     ]
 }

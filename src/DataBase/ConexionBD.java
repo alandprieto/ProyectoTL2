@@ -107,24 +107,19 @@ public class ConexionBD {
 
             // --- Cargar Reseñas ---
             // Reseña de Carlos (ID 3) para Inception (ID 1) - Aprobada
-            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " +
-                               "VALUES (5, 'Una obra maestra, te vuela la cabeza.', 1, '2024-05-20T10:00:00', 3, 1);");
+            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " + "VALUES (5, 'Una obra maestra, te vuela la cabeza.', 1, '2024-05-20T10:00:00', 3, 1);");
             
             // Reseña de Ana (ID 4) para The Dark Knight (ID 3) - Aprobada
-            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " +
-                               "VALUES (5, 'La mejor película de superhéroes.', 1, '2024-05-21T11:30:00', 4, 3);");
+            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " + "VALUES (5, 'La mejor película de superhéroes.', 1, '2024-05-21T11:30:00', 4, 3);");
 
             // Reseña de Lucia (ID 5) para The Matrix (ID 5) - Pendiente de aprobación
-            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " +
-                               "VALUES (4, 'Revolucionaria para su época.', 0, '2024-05-22T15:00:00', 5, 5);");
+            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " + "VALUES (4, 'Revolucionaria para su época.', 0, '2024-05-22T15:00:00', 5, 5);");
 
             // Reseña de Carlos (ID 3) para Pulp Fiction (ID 4) - Pendiente de aprobación
-            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " +
-                               "VALUES (3, 'Un poco rara pero buenos diálogos.', 0, '2024-05-23T18:45:00', 3, 4);");
+            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " + "VALUES (3, 'Un poco rara pero buenos diálogos.', 0, '2024-05-23T18:45:00', 3, 4);");
 
             // Reseña de Ana (ID 4) para Inception (ID 1) - Aprobada
-            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " +
-                               "VALUES (4, 'Tuve que verla dos veces para entenderla. Genial!', 1, '2024-05-24T09:00:00', 4, 1);");
+            stmt.executeUpdate("INSERT INTO RESENIA (CALIFICACION, COMENTARIO, APROBADO, FECHA_HORA, ID_USUARIO, ID_PELICULA) " + "VALUES (4, 'Tuve que verla dos veces para entenderla. Genial!', 1, '2024-05-24T09:00:00', 4, 1);");
             System.out.println("-> 5 reseñas cargadas.");
 
             System.out.println("Carga de datos iniciales completada.");
