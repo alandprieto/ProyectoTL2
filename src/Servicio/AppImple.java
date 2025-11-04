@@ -263,7 +263,7 @@ public class AppImple implements IAppServicio {
         this.reseñaDAO.aprobarResenia(resenaID);
     }
 
-    private Usuario autenticarUsuarioPorRol(Scanner scanner, Class<? extends Usuario> tipoUsuarioEsperado) {
+    private Usuario autenticarUsuarioPorRol(Scanner scanner, Class<? extends Usuario> tipoUsuarioEsperado) { 
         System.out.println("\n--- Autenticación de Usuario Requerida ---");
         System.out.print("Ingrese su email: ");
         String email = scanner.nextLine();
