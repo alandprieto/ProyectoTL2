@@ -24,13 +24,9 @@ public class ReseñaDAOimple implements ReseñaDAO {
 
             pstmt.setInt(1, resenia.getCalificacion());
             pstmt.setString(2, resenia.getComentario());
-
-            // Guardamos la fecha y hora actual en formato de texto estándar
             pstmt.setString(3, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-
             pstmt.setInt(4, resenia.getUsuario().getID());
             pstmt.setInt(5, resenia.getIDContenido());
-
             int filasAfectadas = pstmt.executeUpdate();
             if (filasAfectadas > 0) {
                 try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {

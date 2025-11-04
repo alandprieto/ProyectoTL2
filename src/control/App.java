@@ -36,18 +36,14 @@ public class App {
                 opcion = Integer.parseInt(scanner.nextLine());
                 switch (opcion) {
                     case 1:
-                        // 1. App llama a AppCargaDatos para obtener el objeto
                         Cliente nuevoCliente = cargadorDatos.solicitarDatosCliente();
                         if (nuevoCliente != null) {
-                            // 2. App pasa el objeto a AppImple (servicio) para guardarlo
                             servicio.registrarCliente(nuevoCliente);
                         }
                         break;
                     case 2:
-                        // 1. App llama a AppCargaDatos para obtener el objeto
                         Administrador nuevoAdmin = cargadorDatos.solicitarDatosAdmin(TokenAdm);
                         if (nuevoAdmin != null) {
-                            // 2. App pasa el objeto a AppImple (servicio) para guardarlo
                             servicio.registrarAdmin(nuevoAdmin);
                         }
                         break;
@@ -58,22 +54,18 @@ public class App {
                         }
                         break;
                     case 4:
-                        // Corregido: Pasar el scanner al servicio
                         servicio.listarPeliculas();
                         break;
                     case 5:
-                        // Corregido: Pasar el scanner al servicio
                         servicio.listarUsuarios();
                         break;
                     case 6:
-                        // Corregido: Pasar el scanner al servicio
                         Usuario cliente = cargadorDatos.autenticarUsuarioPorRol(Cliente.class);
                         if (cliente != null) {
                             servicio.registrarResena(cliente);
                         }
                         break;
                     case 7:
-                        // Corregido: Pasar el scanner al servicio
                         Usuario admin = cargadorDatos.autenticarUsuarioPorRol(Administrador.class);
                         if (admin != null){
                             servicio.aprobarResena();

@@ -35,14 +35,10 @@ public class AppImple implements AppServicio {
         this.reseñaDAO = new ReseñaDAOimple();
         ConexionBD.getConnection();
     }
-
-    // --- MÉTODOS MODIFICADOS ---
     
     @Override
-    // Ahora recibe el objeto Cliente directamente
     public void registrarCliente(Cliente cliente) {
         System.out.println("\n--- Registrando Cliente ---");
-        // La lógica de solicitar datos se fue. Solo se guarda.
         if (this.usuarioDAO.guardar(cliente)) {
             System.out.println("Cliente registrado exitosamente.");
         } else {
@@ -51,10 +47,8 @@ public class AppImple implements AppServicio {
     }
 
     @Override
-    // Ahora recibe el objeto Administrador directamente
     public void registrarAdmin(Administrador admin) {
         System.out.println("\n--- Registrando Administrador ---");
-        // La lógica de solicitar token y datos se fue. Solo se guarda.
         if (this.usuarioDAO.guardar(admin)) {
             System.out.println("Administrador registrado exitosamente.");
         } else {
@@ -62,17 +56,9 @@ public class AppImple implements AppServicio {
         }
     }
 
-    // Se elimina el método duplicado private Usuario solicitarDatosUsuario(Scanner scanner)
-    // Esa lógica ahora está solo en AppCargaDatos.java
-
-    
-    // --- MÉTODOS SIN CAMBIOS ---
-    // (Estos métodos mantienen su propia lógica de solicitud de datos por ahora)
-
     @Override
     public void cargarPelicula() {
         Scanner scanner = new Scanner(System.in);
-
         System.out.println("\n--- Carga de Nueva Película ---");
         System.out.print("Ingrese título de la película: ");
         String titulo = scanner.nextLine();

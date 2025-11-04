@@ -14,7 +14,7 @@ public class SetupBD {
         "  Apellido VARCHAR(100) NOT NULL," +
         "  Email VARCHAR(150) NOT NULL UNIQUE," +
         "  Contrasena VARCHAR(100) NOT NULL," +
-        "  TipoUsuario VARCHAR(20) NOT NULL" + // 'Cliente' o 'Administrador'
+        "  TipoUsuario VARCHAR(20) NOT NULL" + 
         ");";
 
     private static final String CREATE_PELICULA = 
@@ -23,25 +23,22 @@ public class SetupBD {
         "  Titulo VARCHAR(255) NOT NULL," +
         "  Genero VARCHAR(50)," +
         "  Director VARCHAR(150)," +
-        "  DuracionMinutos INT" + // Ajustado a DuracionMinutos
+        "  DuracionMinutos INT" + 
         ");";
     
     private static final String CREATE_RESENA =
         "CREATE TABLE IF NOT EXISTS Resena (" +
         "  ID INTEGER PRIMARY KEY AUTOINCREMENT," +
-        "  UsuarioID INT NOT NULL," + // Ajustado a UsuarioID
-        "  PeliculaID INT NOT NULL," + // Ajustado a PeliculaID
+        "  UsuarioID INT NOT NULL," + 
+        "  PeliculaID INT NOT NULL," +
         "  Comentario TEXT," +
-        "  Puntaje INT NOT NULL," + // Ajustado a Puntaje
-        "  Aprobada BOOLEAN DEFAULT 0," + // Ajustado a Aprobada
-        "  FechaHora TEXT," + // <-- ¡COLUMNA AÑADIDA!
+        "  Puntaje INT NOT NULL," + 
+        "  Aprobada BOOLEAN DEFAULT 0," + 
+        "  FechaHora TEXT," + 
         "  FOREIGN KEY(UsuarioID) REFERENCES Usuario(ID)," +
         "  FOREIGN KEY(PeliculaID) REFERENCES Pelicula(ID)" +
         ");";
 
-    /**
-     * Ejecuta la creación de todas las tablas necesarias si no existen.
-     */
     public static void crearTablas() {
         Connection conn = ConexionBD.getConnection();
         if (conn == null) {

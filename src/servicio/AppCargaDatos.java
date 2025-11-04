@@ -2,7 +2,6 @@ package servicio;
 
 import java.util.Scanner;
 
-// Se eliminan importaciones DAO y ConexionBD
 import modelo.Administrador;
 import modelo.Cliente;
 import modelo.Usuario;
@@ -19,7 +18,6 @@ public class AppCargaDatos {
         this.usuarioDAO = new UsuarioDAOimple();
     }
     
-    // Método para solicitar datos y DEVOLVER un Cliente
     public Cliente solicitarDatosCliente() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\n--- Registro de Nuevo Cliente ---");
@@ -28,18 +26,16 @@ public class AppCargaDatos {
         
         Cliente cliente = new Cliente(datosUsuario.getDNI(), datosUsuario.getNombre(), datosUsuario.getApellido(), datosUsuario.getEmail(), datosUsuario.getContrasena());
         
-        // Ya no se guarda aquí
         return cliente;
     }
 
-    // Método para solicitar datos y DEVOLVER un Administrador
     public Administrador solicitarDatosAdmin(String TokenAdm) {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Ingrese Token de validacion: ");
         String TokenValido = scanner.nextLine();
         if (!TokenValido.equals(TokenAdm)) { 
             System.out.println("Error: Token no valido"); 
-            return null; // Devuelve null si el token es inválido
+            return null; 
         }
         else{
             System.out.println("\n--- Registro de Nuevo Administrador ---");
@@ -48,12 +44,10 @@ public class AppCargaDatos {
 
             Administrador admin = new Administrador(datosUsuario.getDNI(), datosUsuario.getNombre(), datosUsuario.getApellido(), datosUsuario.getEmail(), datosUsuario.getContrasena());
             
-            // Ya no se guarda aquí
             return admin;
         }
     }
 
-    // Este método auxiliar se mantiene igual
     private Usuario solicitarDatosUsuario(Scanner scanner) {
         long DNI = 0;
         while (true) {
@@ -97,11 +91,31 @@ public class AppCargaDatos {
             }
         } while (!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com") || email.endsWith("@yahoo.com")));
 
-        System.out.print("Ingrese contraseña: ");
-        String contrasena = scanner.nextLine();
+        String contrasena;
+        do {
+            System.out.print("Ingrese contraseña: ");
+            contrasena = scanner.nextLine();
+            if (!validarContrasena(contrasena)) {
+                System.out.println("Error: La contraseña debe tener al menos 8 caracteres y contener al menos un número.");
+            }
+        } while (!validarContrasena(contrasena));
 
-        // Devuelve un objeto base (Cliente) con los datos, AppCargaDatos lo convertirá
         return new Cliente(DNI, nombre, apellido, email, contrasena);
+    }
+
+    private boolean validarContrasena(String contrasena) {
+        if (contrasena == null || contrasena.length() < 8) {
+            return false;
+        }
+        boolean tieneNumero = false;
+        for (char c : contrasena.toCharArray()) {
+            if (c >= '0' && c <= '9') {
+                tieneNumero = true;
+                break;
+            }
+        }
+        
+        return tieneNumero;
     }
 
     public Usuario autenticarUsuarioPorRol(Class<? extends Usuario> tipoUsuarioEsperado) { 

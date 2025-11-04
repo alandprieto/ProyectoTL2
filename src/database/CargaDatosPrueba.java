@@ -7,9 +7,6 @@ import java.sql.ResultSet;
 
 public class CargaDatosPrueba {
 
-    /**
-     * Carga un conjunto de datos de prueba si la base de datos está vacía.
-     */
     public static void cargarDatos() {
         Connection conn = ConexionBD.getConnection();
         if (conn == null) {
@@ -19,7 +16,6 @@ public class CargaDatosPrueba {
 
         try (Statement stmt = conn.createStatement()) {
             
-            // 1. Verificamos si la tabla de usuarios está vacía
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Usuario");
             int userCount = 0;
             if (rs.next()) {
@@ -27,22 +23,16 @@ public class CargaDatosPrueba {
             }
             rs.close(); 
 
-            // 2. Si está vacía (count == 0), insertamos los datos
             if (userCount == 0) {
                 System.out.println("Base de datos vacía. Cargando datos de prueba...");
-                
-                // --- Cargar Usuarios ---
-                // (Se cambió ROL por TipoUsuario y 'ADMIN' por 'Administrador' / 'CLIENTE' por 'Cliente' 
-                // para coincidir con la lógica de autenticación)
+
                 stmt.execute("INSERT INTO Usuario (DNI, Nombre, Apellido, Email, Contrasena, TipoUsuario) VALUES (11111111, 'Admin', 'Uno', 'admin1@streaming.com', 'admin123', 'Administrador');");
                 stmt.execute("INSERT INTO Usuario (DNI, Nombre, Apellido, Email, Contrasena, TipoUsuario) VALUES (22222222, 'Super', 'Visor', 'admin2@streaming.com', 'admin123', 'Administrador');");
                 stmt.execute("INSERT INTO Usuario (DNI, Nombre, Apellido, Email, Contrasena, TipoUsuario) VALUES (33333333, 'Carlos', 'Gomez', 'carlos@gmail.com', 'pass123', 'Cliente');");
                 stmt.execute("INSERT INTO Usuario (DNI, Nombre, Apellido, Email, Contrasena, TipoUsuario) VALUES (44444444, 'Ana', 'Perez', 'ana@hotmail.com', 'pass123', 'Cliente');");
                 stmt.execute("INSERT INTO Usuario (DNI, Nombre, Apellido, Email, Contrasena, TipoUsuario) VALUES (55555555, 'Lucia', 'Diaz', 'lucia@yahoo.com', 'pass123', 'Cliente');");
                 System.out.println("-> 5 usuarios cargados.");
-
-                // --- Cargar Películas ---
-                // (Se cambió DURACION por DuracionMinutos)
+                
                 stmt.execute("INSERT INTO Pelicula (Genero, Titulo, Director, DuracionMinutos) VALUES ('CIENCIA_FICCION', 'Inception', 'Christopher Nolan', 148);");
                 stmt.execute("INSERT INTO Pelicula (Genero, Titulo, Director, DuracionMinutos) VALUES ('DRAMA', 'The Shawshank Redemption', 'Frank Darabont', 142);");
                 stmt.execute("INSERT INTO Pelicula (Genero, Titulo, Director, DuracionMinutos) VALUES ('ACCION', 'The Dark Knight', 'Christopher Nolan', 152);");
@@ -50,10 +40,6 @@ public class CargaDatosPrueba {
                 stmt.execute("INSERT INTO Pelicula (Genero, Titulo, Director, DuracionMinutos) VALUES ('CIENCIA_FICCION', 'The Matrix', 'Wachowskis', 136);");
                 System.out.println("-> 5 películas cargadas.");
 
-                // --- Cargar Reseñas ---
-                // (Se cambiaron: CALIFICACION -> Puntaje, APROBADO -> Aprobada, 
-                // ID_USUARIO -> UsuarioID, ID_PELICULA -> PeliculaID. Se añadió FechaHora)
-                
                 // Reseña de Carlos (ID 3) para Inception (ID 1) - Aprobada
                 stmt.execute("INSERT INTO Resena (Puntaje, Comentario, Aprobada, FechaHora, UsuarioID, PeliculaID) " +
                              "VALUES (5, 'Una obra maestra, te vuela la cabeza.', 1, '2024-05-20T10:00:00', 3, 1);");
