@@ -24,7 +24,8 @@ import DAO.PeliculaDAOimple;
 import DAO.ReseñaDAOimple;
 import DAO.UsuarioDAOimple;
 
-public class AppImple implements IAppServicio {
+
+public class AppImple implements AppServicio {
     private UsuarioDAO usuarioDAO;
     private PeliculaDAO peliculaDAO;
     private ReseñaDAO reseñaDAO;
@@ -35,13 +36,13 @@ public class AppImple implements IAppServicio {
         ConexionBD.getConnection();
     }
 
+    // --- MÉTODOS MODIFICADOS ---
+    
     @Override
-    public void registrarCliente(Scanner scanner) {
-        System.out.println("\n--- Registro de Nuevo Cliente ---");
-        Usuario datosUsuario = solicitarDatosUsuario(scanner);
-        if (datosUsuario == null) return;
-
-        Cliente cliente = new Cliente(datosUsuario.getDNI(), datosUsuario.getNombre(), datosUsuario.getApellido(), datosUsuario.getEmail(), datosUsuario.getContrasena());
+    // Ahora recibe el objeto Cliente directamente
+    public void registrarCliente(Cliente cliente) {
+        System.out.println("\n--- Registrando Cliente ---");
+        // La lógica de solicitar datos se fue. Solo se guarda.
         if (this.usuarioDAO.guardar(cliente)) {
             System.out.println("Cliente registrado exitosamente.");
         } else {
@@ -50,80 +51,30 @@ public class AppImple implements IAppServicio {
     }
 
     @Override
-    public void registrarAdmin(Scanner scanner, String TokenAdm) {
-        System.out.print("Ingrese Token de validacion: ");
-        String TokenValido = scanner.nextLine();
-        if (!TokenValido.equals(TokenAdm)) { 
-            System.out.println("Error: Token no valido"); 
-            return;
-        }
-        else{
-            System.out.println("\n--- Registro de Nuevo Administrador ---");
-            Usuario datosUsuario = solicitarDatosUsuario(scanner);
-            if (datosUsuario == null) return;
-
-            Administrador admin = new Administrador(datosUsuario.getDNI(), datosUsuario.getNombre(), datosUsuario.getApellido(), datosUsuario.getEmail(), datosUsuario.getContrasena());
-            if (this.usuarioDAO.guardar(admin)) {
-                System.out.println("Administrador registrado exitosamente.");
-            } else {
-                System.out.println("No se pudo registrar al administrador (el email ya podría existir).");
-            }
+    // Ahora recibe el objeto Administrador directamente
+    public void registrarAdmin(Administrador admin) {
+        System.out.println("\n--- Registrando Administrador ---");
+        // La lógica de solicitar token y datos se fue. Solo se guarda.
+        if (this.usuarioDAO.guardar(admin)) {
+            System.out.println("Administrador registrado exitosamente.");
+        } else {
+            System.out.println("No se pudo registrar al administrador (el email ya podría existir).");
         }
     }
 
-    private Usuario solicitarDatosUsuario(Scanner scanner) {
-        long DNI = 0;
-        while (true) {
-            System.out.print("Ingrese DNI (sin puntos ni comas): ");
-            try {
-                DNI = Long.parseLong(scanner.nextLine());
-                String dniStr = String.valueOf(DNI);
-                if (DNI > 0 && dniStr.length() >= 7 && dniStr.length() <= 8) {
-                    break;
-                }
-                System.out.println("Error: El DNI debe ser un número positivo de 7 u 8 dígitos.");
-            } catch (NumberFormatException e) {
-                System.out.println("Error: Por favor, ingrese un número válido para el DNI.");
-            }
-        }
+    // Se elimina el método duplicado private Usuario solicitarDatosUsuario(Scanner scanner)
+    // Esa lógica ahora está solo en AppCargaDatos.java
 
-        String nombre;
-        do {
-            System.out.print("Ingrese nombre: ");
-            nombre = scanner.nextLine();
-            if (!nombre.matches("[a-zA-Z ]+")) {
-                System.out.println("Error: El nombre solo debe contener letras y espacios.");
-            }
-        } while (!nombre.matches("[a-zA-Z ]+"));
-
-        String apellido;
-        do {
-            System.out.print("Ingrese apellido: ");
-            apellido = scanner.nextLine();
-            if (!apellido.matches("[a-zA-Z ]+")) {
-                System.out.println("Error: El apellido solo debe contener letras y espacios.");
-            }
-        } while (!apellido.matches("[a-zA-Z ]+"));
-
-        String email;
-        do {
-            System.out.print("Ingrese email: ");
-            email = scanner.nextLine();
-            if (!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com") || email.endsWith("@yahoo.com"))) {
-                System.out.println("Error: El email debe tener una terminación válida (@gmail, @hotmail, @outlook, @yahoo).");
-            }
-        } while (!(email.endsWith("@gmail.com") || email.endsWith("@hotmail.com") || email.endsWith("@outlook.com") || email.endsWith("@yahoo.com")));
-
-        System.out.print("Ingrese contraseña: ");
-        String contrasena = scanner.nextLine();
-
-        return new Cliente(DNI, nombre, apellido, email, contrasena);
-    }
+    
+    // --- MÉTODOS SIN CAMBIOS ---
+    // (Estos métodos mantienen su propia lógica de solicitud de datos por ahora)
 
     @Override
-    public void cargarPelicula(Scanner scanner) {
-        Usuario admin = autenticarUsuarioPorRol(scanner, Administrador.class);
+    public void cargarPelicula() {
+        Scanner scanner = new Scanner(System.in);
+        Usuario admin = autenticarUsuarioPorRol(Administrador.class);
         if (admin == null) {
+            scanner.close();
             return; 
         }
 
@@ -144,17 +95,21 @@ public class AppImple implements IAppServicio {
         String confirmacion = scanner.nextLine().trim().toUpperCase();
         if (!confirmacion.equals("Y")) {
             System.out.println("Operación cancelada. La película no fue cargada.");
+            scanner.close();
             return;
         }
         this.peliculaDAO.guardar(pelicula);
+        scanner.close();
     }
 
     @Override
-    public void listarPeliculas(Scanner scanner) {
+    public void listarPeliculas() {
+        Scanner scanner = new Scanner(System.in);
         List<Pelicula> peliculas = this.peliculaDAO.listarTodas();
         if (peliculas.isEmpty()) {
             System.out.println("No hay películas registradas.");
-        return;
+            scanner.close();
+            return;
         }
         System.out.print("Ordenar por (1: Título, 2: Género, 3: Duración): ");
         int orden = Integer.parseInt(scanner.nextLine());
@@ -173,13 +128,16 @@ public class AppImple implements IAppServicio {
         for (Pelicula p : peliculas) {
             System.out.printf("Título: %s | Género: %s | Duración: %d min\n", p.getTitulo(), p.getGenero(), p.getDuracion().toMinutes());
         }
+        scanner.close();
     }
 
     @Override
-    public void listarUsuarios(Scanner scanner) {
+    public void listarUsuarios() {
+        Scanner scanner = new Scanner(System.in);
         List<Usuario> usuarios = this.usuarioDAO.listarTodos();
         if (usuarios.isEmpty()) {
             System.out.println("No hay usuarios registrados.");
+            scanner.close();
             return;
         }
         System.out.print("Ordenar por (1: Nombre, 2: Email): ");
@@ -196,12 +154,15 @@ public class AppImple implements IAppServicio {
         for (Usuario u : usuarios) {
             System.out.printf("Nombre: %s | Email: %s\n", u.getNombre(), u.getEmail());
         }
+        scanner.close();
     }
 
     @Override
-    public void registrarResena(Scanner scanner) {
-        Usuario usuario = autenticarUsuarioPorRol(scanner, Cliente.class);
+    public void registrarResena() {
+        Scanner scanner = new Scanner(System.in);
+        Usuario usuario = autenticarUsuarioPorRol(Cliente.class);
         if (usuario == null) {
+            scanner.close();
             return; 
         }
 
@@ -209,6 +170,7 @@ public class AppImple implements IAppServicio {
         List<Pelicula> peliculas = this.peliculaDAO.listarTodas();
         if (peliculas.isEmpty()) {
             System.out.println("No hay películas cargadas en el sistema.");
+            scanner.close();
             return;
         }
         for (Pelicula p : peliculas) {
@@ -236,15 +198,19 @@ public class AppImple implements IAppServicio {
         String confirmacion = scanner.nextLine().trim().toUpperCase();
         if (!confirmacion.equals("Y")) {
             System.out.println("Operación cancelada. La reseña no fue registrada.");
+            scanner.close();
             return;
         }
         this.reseñaDAO.guardar(reseña);
+        scanner.close();
     }
 
     @Override
-    public void aprobarResena(Scanner scanner) {
-        Usuario admin = autenticarUsuarioPorRol(scanner, Administrador.class);
+    public void aprobarResena() {
+        Scanner scanner = new Scanner(System.in);
+        Usuario admin = autenticarUsuarioPorRol(Administrador.class);
         if (admin == null) {
+            scanner.close();
             return; 
         }
 
@@ -252,6 +218,7 @@ public class AppImple implements IAppServicio {
         List<Reseña> reseniasNoAprobadas = this.reseñaDAO.listarNoAprobadas();
         if (reseniasNoAprobadas.isEmpty()) {
             System.out.println("No hay reseñas pendientes de aprobación.");
+            scanner.close();
             return;
         }
         System.out.println("Reseñas pendientes:");
@@ -261,9 +228,11 @@ public class AppImple implements IAppServicio {
         System.out.print("Ingrese ID de la reseña a aprobar: ");
         int resenaID = Integer.parseInt(scanner.nextLine());
         this.reseñaDAO.aprobarResenia(resenaID);
+        scanner.close();
     }
 
-    private Usuario autenticarUsuarioPorRol(Scanner scanner, Class<? extends Usuario> tipoUsuarioEsperado) { 
+    private Usuario autenticarUsuarioPorRol(Class<? extends Usuario> tipoUsuarioEsperado) { 
+        Scanner scanner = new Scanner(System.in);
         System.out.println("\n--- Autenticación de Usuario Requerida ---");
         System.out.print("Ingrese su email: ");
         String email = scanner.nextLine();
@@ -272,13 +241,16 @@ public class AppImple implements IAppServicio {
         Usuario usuario = this.usuarioDAO.autenticar(email, contrasena);
         if (usuario == null) {
             System.out.println("Error: Credenciales incorrectas.");
+            scanner.close();
             return null;
         }
         if (!tipoUsuarioEsperado.isInstance(usuario)) {
             System.out.println("Error: Permisos insuficientes para esta acción.");
+            scanner.close();
             return null;
         }
         System.out.println("Autenticación exitosa. ¡Bienvenido, " + usuario.getNombre() + "!");
+        scanner.close();
         return usuario;
     }
 }

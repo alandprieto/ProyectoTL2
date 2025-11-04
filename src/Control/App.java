@@ -1,13 +1,24 @@
 package Control;
 
 import java.util.Scanner;
-import DataBase.ConexionBD; 
-import Servicio.IAppServicio;
+
+import DataBase.ConexionBD;
+import DataBase.SetupBD;
+import DataBase.CargaDatosPrueba;
+
+import Servicio.AppServicio;
 import Servicio.AppImple;
+import Servicio.AppCargaDatos; // Importar AppCargaDatos
+
+import Usuario.Administrador; // Importar Administrador
+import Usuario.Cliente; // Importar Cliente
 
 public class App {
     public static void main(String[] args) {
-        IAppServicio servicio = new AppImple();
+        SetupBD.crearTablas();
+        CargaDatosPrueba.cargarDatos();
+        AppServicio servicio = new AppImple();
+        AppCargaDatos cargadorDatos = new AppCargaDatos(); // Instanciar el cargador de datos
         String TokenAdm = "zlra4142";
         Scanner scanner = new Scanner(System.in);
         int opcion = -1;
@@ -26,28 +37,42 @@ public class App {
                 opcion = Integer.parseInt(scanner.nextLine());
                 switch (opcion) {
                     case 1:
-                        servicio.registrarCliente(scanner); 
+                        // 1. App llama a AppCargaDatos para obtener el objeto
+                        Cliente nuevoCliente = cargadorDatos.solicitarDatosCliente();
+                        if (nuevoCliente != null) {
+                            // 2. App pasa el objeto a AppImple (servicio) para guardarlo
+                            servicio.registrarCliente(nuevoCliente);
+                        }
                         break;
                     case 2:
-                        servicio.registrarAdmin(scanner,TokenAdm);
+                        // 1. App llama a AppCargaDatos para obtener el objeto
+                        Administrador nuevoAdmin = cargadorDatos.solicitarDatosAdmin(TokenAdm);
+                        if (nuevoAdmin != null) {
+                            // 2. App pasa el objeto a AppImple (servicio) para guardarlo
+                            servicio.registrarAdmin(nuevoAdmin);
+                        }
                         break;
                     case 3:
-                        servicio.cargarPelicula(scanner);
+                        // Corregido: Pasar el scanner al servicio
+                        servicio.cargarPelicula();
                         break;
                     case 4:
-                        servicio.listarPeliculas(scanner);
+                        // Corregido: Pasar el scanner al servicio
+                        servicio.listarPeliculas();
                         break;
                     case 5:
-                        servicio.listarUsuarios(scanner);
+                        // Corregido: Pasar el scanner al servicio
+                        servicio.listarUsuarios();
                         break;
                     case 6:
-                        servicio.registrarResena(scanner);
+                        // Corregido: Pasar el scanner al servicio
+                        servicio.registrarResena();
                         break;
                     case 7:
-                        servicio.aprobarResena(scanner);
+                        // Corregido: Pasar el scanner al servicio
+                        servicio.aprobarResena();
                         break;
                     case 0:
-                        ConexionBD.cerrarConexion();
                         break;
                     default:
                         System.out.println("Opcion no valida. Intente de nuevo.");
@@ -56,6 +81,8 @@ public class App {
                 System.out.println("Error: Por favor, ingrese un numero.");
             } catch (Exception e) {
                 System.out.println("Ocurrio un error inesperado: " + e.getMessage());
+            } finally {
+                ConexionBD.cerrarConexion();
             }
         }
         System.out.println("Saliendo de la aplicacion...");
