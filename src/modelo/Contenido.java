@@ -1,7 +1,7 @@
-package Catalogo;
+package modelo;
 import java.util.List;
 
-import ENUM.GeneroPelicula;
+import enums.GeneroPelicula;
 
 import java.nio.file.Path;
 

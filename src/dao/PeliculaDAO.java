@@ -1,7 +1,8 @@
-package DAO;
+package dao;
 
-import java.util.List;  
-import Catalogo.Pelicula;
+import java.util.List;
+
+import modelo.Pelicula;
 
 public interface PeliculaDAO {
     void guardar(Pelicula pelicula);

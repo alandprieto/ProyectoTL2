@@ -1,7 +1,8 @@
-package DAO;
+package dao;
 
-import Usuario.Usuario;
 import java.util.List;
+
+import modelo.Usuario;
 
 public interface UsuarioDAO {
     boolean guardar(Usuario usuario);

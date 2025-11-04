@@ -1,7 +1,8 @@
-package Servicio;
+package servicio;
 
-import Usuario.Administrador;
-import Usuario.Cliente;
+import modelo.Usuario;
+import modelo.Administrador;
+import modelo.Cliente;
 
 public interface AppServicio {
 
@@ -15,7 +16,7 @@ public interface AppServicio {
     
     void listarUsuarios();
     
-    void registrarResena();
+    void registrarResena(Usuario cliente);
     
     void aprobarResena();
 }

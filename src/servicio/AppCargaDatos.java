@@ -1,12 +1,23 @@
-package Servicio;
+package servicio;
 
 import java.util.Scanner;
-import Usuario.Administrador;
-import Usuario.Cliente;
-import Usuario.Usuario;
+
 // Se eliminan importaciones DAO y ConexionBD
+import modelo.Administrador;
+import modelo.Cliente;
+import modelo.Usuario;
+
+import dao.UsuarioDAO;
+import dao.UsuarioDAOimple;
+
 
 public class AppCargaDatos {
+
+    private UsuarioDAO usuarioDAO;
+
+    public AppCargaDatos() {
+        this.usuarioDAO = new UsuarioDAOimple();
+    }
     
     // Método para solicitar datos y DEVOLVER un Cliente
     public Cliente solicitarDatosCliente() {
@@ -91,5 +102,28 @@ public class AppCargaDatos {
 
         // Devuelve un objeto base (Cliente) con los datos, AppCargaDatos lo convertirá
         return new Cliente(DNI, nombre, apellido, email, contrasena);
+    }
+
+    public Usuario autenticarUsuarioPorRol(Class<? extends Usuario> tipoUsuarioEsperado) { 
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\n--- Autenticación de Usuario Requerida ---");
+        System.out.print("Ingrese su email: ");
+        String email = scanner.nextLine();
+        System.out.print("Ingrese su contraseña: ");
+        String contrasena = scanner.nextLine();
+        Usuario usuario = this.usuarioDAO.autenticar(email, contrasena);
+        if (usuario == null) {
+            System.out.println("Error: Credenciales incorrectas.");
+            scanner.close();
+            return null;
+        }
+        if (!tipoUsuarioEsperado.isInstance(usuario)) {
+            System.out.println("Error: Permisos insuficientes para esta acción.");
+            scanner.close();
+            return null;
+        }
+        System.out.println("Autenticación exitosa. ¡Bienvenido, " + usuario.getNombre() + "!");
+        scanner.close();
+        return usuario;
     }
 }

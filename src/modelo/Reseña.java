@@ -1,6 +1,4 @@
-package Catalogo;
-
-import Usuario.Usuario;
+package modelo;
 
 public class Reseña {
     private int ID;

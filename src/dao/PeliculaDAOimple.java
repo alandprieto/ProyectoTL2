@@ -1,4 +1,4 @@
-package DAO;
+package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,10 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import Catalogo.Pelicula;
-import DataBase.ConexionBD;
-import ENUM.GeneroPelicula;
-import Catalogo.Staff;
+import enums.GeneroPelicula;
+import modelo.Pelicula;
+import modelo.Staff;
+import database.ConexionBD;
 
 import java.time.Duration;
 

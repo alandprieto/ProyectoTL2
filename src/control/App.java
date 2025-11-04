@@ -1,17 +1,16 @@
-package Control;
+package control;
 
 import java.util.Scanner;
 
-import DataBase.ConexionBD;
-import DataBase.SetupBD;
-import DataBase.CargaDatosPrueba;
-
-import Servicio.AppServicio;
-import Servicio.AppImple;
-import Servicio.AppCargaDatos; // Importar AppCargaDatos
-
-import Usuario.Administrador; // Importar Administrador
-import Usuario.Cliente; // Importar Cliente
+import database.CargaDatosPrueba;
+import database.ConexionBD;
+import database.SetupBD;
+import modelo.Usuario;
+import modelo.Administrador;
+import modelo.Cliente;
+import servicio.AppCargaDatos;
+import servicio.AppImple;
+import servicio.AppServicio;
 
 public class App {
     public static void main(String[] args) {
@@ -53,8 +52,10 @@ public class App {
                         }
                         break;
                     case 3:
-                        // Corregido: Pasar el scanner al servicio
-                        servicio.cargarPelicula();
+                        Usuario Admin = cargadorDatos.autenticarUsuarioPorRol(Administrador.class);
+                        if (Admin != null) {
+                            servicio.cargarPelicula();
+                        }
                         break;
                     case 4:
                         // Corregido: Pasar el scanner al servicio
@@ -66,11 +67,17 @@ public class App {
                         break;
                     case 6:
                         // Corregido: Pasar el scanner al servicio
-                        servicio.registrarResena();
+                        Usuario cliente = cargadorDatos.autenticarUsuarioPorRol(Cliente.class);
+                        if (cliente != null) {
+                            servicio.registrarResena(cliente);
+                        }
                         break;
                     case 7:
                         // Corregido: Pasar el scanner al servicio
-                        servicio.aprobarResena();
+                        Usuario admin = cargadorDatos.autenticarUsuarioPorRol(Administrador.class);
+                        if (admin != null){
+                            servicio.aprobarResena();
+                        }
                         break;
                     case 0:
                         break;

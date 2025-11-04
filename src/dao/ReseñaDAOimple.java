@@ -1,4 +1,4 @@
-package DAO;
+package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,9 +9,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import Catalogo.Reseña;
-import DataBase.ConexionBD;
-import Usuario.Usuario;
+import database.ConexionBD;
+import modelo.Reseña;
+import modelo.Usuario;
 
 public class ReseñaDAOimple implements ReseñaDAO {
 

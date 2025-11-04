@@ -1,4 +1,4 @@
-package Catalogo;
+package modelo;
 
 public class Staff {
     private String nombre;

@@ -1,28 +1,28 @@
-package Servicio;
+package servicio;
 
 import java.time.Duration;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
-import Catalogo.Pelicula;
-import Catalogo.Reseña;
-import Catalogo.Staff;
-
-import ENUM.GeneroPelicula;
-
-import Usuario.Administrador;
-import Usuario.Cliente;
-import Usuario.Usuario;
-
-import DataBase.ConexionBD;
-
-import DAO.PeliculaDAO;
-import DAO.ReseñaDAO;
-import DAO.UsuarioDAO;
-import DAO.PeliculaDAOimple;
-import DAO.ReseñaDAOimple;
-import DAO.UsuarioDAOimple;
+import comparador.ComparadorPeliculaDuracion;
+import comparador.ComparadorPeliculaGenero;
+import comparador.ComparadorPeliculaTitulo;
+import comparador.ComparadorUsuarioEmail;
+import comparador.ComparadorUsuarioNombre;
+import dao.PeliculaDAO;
+import dao.PeliculaDAOimple;
+import dao.ReseñaDAO;
+import dao.ReseñaDAOimple;
+import dao.UsuarioDAO;
+import dao.UsuarioDAOimple;
+import database.ConexionBD;
+import enums.GeneroPelicula;
+import modelo.Administrador;
+import modelo.Cliente;
+import modelo.Pelicula;
+import modelo.Reseña;
+import modelo.Staff;
+import modelo.Usuario;
 
 
 public class AppImple implements AppServicio {
@@ -72,11 +72,6 @@ public class AppImple implements AppServicio {
     @Override
     public void cargarPelicula() {
         Scanner scanner = new Scanner(System.in);
-        Usuario admin = autenticarUsuarioPorRol(Administrador.class);
-        if (admin == null) {
-            scanner.close();
-            return; 
-        }
 
         System.out.println("\n--- Carga de Nueva Película ---");
         System.out.print("Ingrese título de la película: ");
@@ -115,13 +110,13 @@ public class AppImple implements AppServicio {
         int orden = Integer.parseInt(scanner.nextLine());
         switch(orden) {
             case 1:
-                peliculas.sort(Comparator.comparing(Pelicula::getTitulo));
+                peliculas.sort(new ComparadorPeliculaTitulo());
             break;
             case 2:
-                peliculas.sort(Comparator.comparing(p -> p.getGenero().name()));
+                peliculas.sort(new ComparadorPeliculaGenero());
             break;
             case 3:
-                peliculas.sort(Comparator.comparingInt(p -> (int) p.getDuracion().toMinutes()));
+                peliculas.sort(new ComparadorPeliculaDuracion());
             break;
         }
         System.out.println("\n--- Listado de Películas ---");
@@ -144,10 +139,10 @@ public class AppImple implements AppServicio {
         int orden = Integer.parseInt(scanner.nextLine());
         switch(orden) {
             case 1:
-                usuarios.sort(Comparator.comparing(Usuario::getNombre));
+                usuarios.sort(new ComparadorUsuarioNombre());
             break;
             case 2:
-                usuarios.sort(Comparator.comparing(Usuario::getEmail));
+                usuarios.sort(new ComparadorUsuarioEmail());
             break;
         }
         System.out.println("\n--- Listado de Usuarios ---");
@@ -158,13 +153,8 @@ public class AppImple implements AppServicio {
     }
 
     @Override
-    public void registrarResena() {
+    public void registrarResena(Usuario usuario) {
         Scanner scanner = new Scanner(System.in);
-        Usuario usuario = autenticarUsuarioPorRol(Cliente.class);
-        if (usuario == null) {
-            scanner.close();
-            return; 
-        }
 
         System.out.println("\n--- Registro de Nueva Reseña ---");
         List<Pelicula> peliculas = this.peliculaDAO.listarTodas();
@@ -208,11 +198,6 @@ public class AppImple implements AppServicio {
     @Override
     public void aprobarResena() {
         Scanner scanner = new Scanner(System.in);
-        Usuario admin = autenticarUsuarioPorRol(Administrador.class);
-        if (admin == null) {
-            scanner.close();
-            return; 
-        }
 
         System.out.println("\n--- Aprobación de Reseñas ---");
         List<Reseña> reseniasNoAprobadas = this.reseñaDAO.listarNoAprobadas();
@@ -231,26 +216,4 @@ public class AppImple implements AppServicio {
         scanner.close();
     }
 
-    private Usuario autenticarUsuarioPorRol(Class<? extends Usuario> tipoUsuarioEsperado) { 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("\n--- Autenticación de Usuario Requerida ---");
-        System.out.print("Ingrese su email: ");
-        String email = scanner.nextLine();
-        System.out.print("Ingrese su contraseña: ");
-        String contrasena = scanner.nextLine();
-        Usuario usuario = this.usuarioDAO.autenticar(email, contrasena);
-        if (usuario == null) {
-            System.out.println("Error: Credenciales incorrectas.");
-            scanner.close();
-            return null;
-        }
-        if (!tipoUsuarioEsperado.isInstance(usuario)) {
-            System.out.println("Error: Permisos insuficientes para esta acción.");
-            scanner.close();
-            return null;
-        }
-        System.out.println("Autenticación exitosa. ¡Bienvenido, " + usuario.getNombre() + "!");
-        scanner.close();
-        return usuario;
-    }
 }

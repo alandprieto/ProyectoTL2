@@ -1,7 +1,8 @@
-package DAO;
+package dao;
 
-import java.util.List;  
-import Catalogo.Reseña;
+import java.util.List;
+
+import modelo.Reseña;
 
 public interface ReseñaDAO {
     void guardar(Reseña resenia);

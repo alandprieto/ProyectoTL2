@@ -1,9 +1,9 @@
-package Catalogo;
+package modelo;
 
 import java.time.Duration;
 import java.util.List;
 
-import ENUM.GeneroPelicula;
+import enums.GeneroPelicula;
 
 import java.nio.file.Path;
 
