@@ -10,4 +10,5 @@ public interface UsuarioDAO {
     List<Usuario> listarTodos();
     void eliminar(int id);
     Usuario autenticar(String email, String contrasena);
+    boolean dniExiste(long dni);
 }

@@ -170,34 +170,96 @@ public class UsuarioDAOimple implements UsuarioDAO {
         }
     }
 
-    public void actualizar(Usuario usuario) {
-        String sql = "UPDATE USUARIO SET DNI = ?, NOMBRE = ?, APELLIDO = ?, EMAIL = ?, CONTRASENA = ?, ROL = ? WHERE ID = ?";
-        Connection conn = ConexionBD.getConnection();
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        public void actualizar(Usuario usuario) {
 
-            pstmt.setLong(1, usuario.getDNI());
-            pstmt.setString(2, usuario.getNombre());
-            pstmt.setString(3, usuario.getApellido());
-            pstmt.setString(4, usuario.getEmail());
-            pstmt.setString(5, usuario.getContrasena());
+            String sql = "UPDATE USUARIO SET DNI = ?, NOMBRE = ?, APELLIDO = ?, EMAIL = ?, CONTRASENA = ?, ROL = ? WHERE ID = ?";
 
-            if (usuario instanceof Administrador) {
-                pstmt.setString(6, "ADMIN");
-            } else {
-                pstmt.setString(6, "CLIENTE");
+            Connection conn = ConexionBD.getConnection();
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+    
+
+                pstmt.setLong(1, usuario.getDNI());
+
+                pstmt.setString(2, usuario.getNombre());
+
+                pstmt.setString(3, usuario.getApellido());
+
+                pstmt.setString(4, usuario.getEmail());
+
+                pstmt.setString(5, usuario.getContrasena());
+
+    
+
+                if (usuario instanceof Administrador) {
+
+                    pstmt.setString(6, "ADMIN");
+
+                } else {
+
+                    pstmt.setString(6, "CLIENTE");
+
+                }
+
+    
+
+                pstmt.setInt(7, usuario.getID());
+
+                int filasAfectadas = pstmt.executeUpdate();
+
+    
+
+                if (filasAfectadas > 0) {
+
+                    System.out.println("--> Usuario con ID " + usuario.getID() + " actualizado correctamente.");
+
+                } else {
+
+                    System.out.println("No se encontró un usuario con el ID " + usuario.getID() + " para actualizar.");
+
+                }
+
+    
+
+            } catch (SQLException e) {
+
+                System.err.println("Error al actualizar el usuario: " + e.getMessage());
+
             }
 
-            pstmt.setInt(7, usuario.getID());
-            int filasAfectadas = pstmt.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                System.out.println("--> Usuario con ID " + usuario.getID() + " actualizado correctamente.");
-            } else {
-                System.out.println("No se encontró un usuario con el ID " + usuario.getID() + " para actualizar.");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error al actualizar el usuario: " + e.getMessage());
         }
+
+    
+
+        @Override
+
+        public boolean dniExiste(long dni) {
+
+            String sql = "SELECT 1 FROM USUARIO WHERE DNI = ?";
+
+            Connection conn = ConexionBD.getConnection();
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                pstmt.setLong(1, dni);
+
+                try (ResultSet rs = pstmt.executeQuery()) {
+
+                    return rs.next();
+
+                }
+
+            } catch (SQLException e) {
+
+                System.err.println("Error al verificar si el DNI existe: " + e.getMessage());
+
+            }
+
+            return false;
+
+        }
+
     }
-}
+
+    

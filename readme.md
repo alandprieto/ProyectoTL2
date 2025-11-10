@@ -59,3 +59,13 @@ El proyecto sigue una estructura modular básica:
 
 
 La aplicación mostrará un menú en la consola para interactuar con las funcionalidades implementadas. La base de datos (`streaming.db`) se creará automáticamente en el directorio raíz del proyecto la primera vez que se ejecute la aplicación.
+
+## Cambios
+
+-   Eliminamos la clase `AppServicio.java` y comunicamos `App.java` directamente con `AppImple.java`
+-   `App.java` se encarga de la carga de datos por teclado, mientras que `AppImple.java` se encarga de la comunicación con la base de datos, recibiendo los datos cargados por parametros.
+-   En `App.java`, englobamos el while infinito del menú en un try con un finally, para que siempre se cierre la conexión
+-   Validamos que la contraseña tenga cierta robustez.
+-   Puntaje ahora se obtiene con un promedio de las reseñas.
+-   Implementamos el paquete y las clases `comparador`, ya que la comparación se había hecho en formato lambda y no estaba permitido realizarlo de esa manera.
+-   Se cambió el nombre de los paquetes para que estén en minúsculas.
