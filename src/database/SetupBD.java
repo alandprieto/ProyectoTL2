@@ -13,8 +13,7 @@ public class SetupBD {
         "  Nombre VARCHAR(100) NOT NULL," +
         "  Apellido VARCHAR(100) NOT NULL," +
         "  Email VARCHAR(150) NOT NULL UNIQUE," +
-        "  Contrasena VARCHAR(100) NOT NULL," +
-        "  TipoUsuario VARCHAR(20) NOT NULL" + 
+        "  Contrasena VARCHAR(100) NOT NULL" +
         ");";
 
     private static final String CREATE_PELICULA = 
@@ -22,8 +21,10 @@ public class SetupBD {
         "  ID INTEGER PRIMARY KEY AUTOINCREMENT," +
         "  Titulo VARCHAR(255) NOT NULL," +
         "  Genero VARCHAR(50)," +
-        "  Director VARCHAR(150)," +
-        "  DuracionMinutos INT" + 
+        "  Sinopsis TEXT," +
+        "  Anio INT," +
+        "  Rating REAL," +
+        "  Poster TEXT" + 
         ");";
     
     private static final String CREATE_RESENA =
@@ -33,7 +34,6 @@ public class SetupBD {
         "  PeliculaID INT NOT NULL," +
         "  Comentario TEXT," +
         "  Puntaje INT NOT NULL," + 
-        "  Aprobada BOOLEAN DEFAULT 0," + 
         "  FechaHora TEXT," + 
         "  FOREIGN KEY(UsuarioID) REFERENCES Usuario(ID)," +
         "  FOREIGN KEY(PeliculaID) REFERENCES Pelicula(ID)" +

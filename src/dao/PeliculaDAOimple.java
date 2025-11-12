@@ -10,25 +10,23 @@ import java.util.List;
 
 import enums.GeneroPelicula;
 import modelo.Pelicula;
-import modelo.Staff;
 import database.ConexionBD;
-
-import java.time.Duration;
-
 
 public class PeliculaDAOimple implements PeliculaDAO {
 
     @Override
     public void guardar(Pelicula pelicula) {
-        String sql = "INSERT INTO PELICULA (GENERO, TITULO, DIRECTOR, DURACION) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO PELICULA (GENERO, TITULO, ANIO, SINOPSIS, RATING, POSTER) VALUES (?, ?, ?, ?, ?, ?)";
         Connection conn = ConexionBD.getConnection();
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, pelicula.getGenero().name());
             pstmt.setString(2, pelicula.getTitulo());
-            pstmt.setString(3, pelicula.getDirector().getNombre());
-            pstmt.setLong(4, pelicula.getDuracion().toMinutes());
+            pstmt.setInt(3, pelicula.getAnio());
+            pstmt.setString(4, pelicula.getSinopsis());
+            pstmt.setDouble(5, pelicula.getPuntaje());
+            pstmt.setString(6, pelicula.getPoster());
 
             int filasAfectadas = pstmt.executeUpdate();
             if (filasAfectadas > 0) {
@@ -60,9 +58,9 @@ public class PeliculaDAOimple implements PeliculaDAO {
                 Pelicula pelicula = new Pelicula();
                 pelicula.setID(rs.getInt("ID"));
                 pelicula.setTitulo(rs.getString("TITULO"));
-                pelicula.setDirector(new Staff(rs.getString("DIRECTOR"), "Director"));
-                int duracionMinutos = rs.getInt("DURACION");
-                pelicula.setDuracion(Duration.ofMinutes(duracionMinutos));
+                pelicula.setAnio(rs.getInt("anio"));
+                pelicula.setPuntaje(rs.getDouble("rating"));
+                pelicula.setPoster(rs.getString("poster"));
                 pelicula.setGenero(GeneroPelicula.valueOf(rs.getString("GENERO")));
 
                 peliculas.add(pelicula);
@@ -114,9 +112,9 @@ public class PeliculaDAOimple implements PeliculaDAO {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, pelicula.getGenero().name());
             pstmt.setString(2, pelicula.getTitulo());
-            pstmt.setString(3, pelicula.getDirector().getNombre());
-            pstmt.setLong(4, pelicula.getDuracion().toMinutes());
-            pstmt.setInt(5, pelicula.getID());
+            pstmt.setString(4, pelicula.getSinopsis());
+            pstmt.setDouble(5, pelicula.getPuntaje());
+            pstmt.setString(6, pelicula.getPoster());
 
             int filasAfectadas = pstmt.executeUpdate();
             if (filasAfectadas > 0) {
@@ -127,5 +125,57 @@ public class PeliculaDAOimple implements PeliculaDAO {
         } catch (SQLException e) {
             System.err.println("Error al actualizar la película: " + e.getMessage());
         }
+    }
+
+    @Override
+    public List<Pelicula> peliculasTop10Rank () {
+        List<Pelicula> peliculas = new ArrayList<>();
+        String sql = "SELECT * FROM PELICULA ORDER BY RATING DESC LIMIT 10";
+        Connection conn = ConexionBD.getConnection();
+
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Pelicula pelicula = new Pelicula();
+                pelicula.setID(rs.getInt("ID"));
+                pelicula.setTitulo(rs.getString("TITULO"));
+                pelicula.setAnio(rs.getInt("anio"));
+                pelicula.setPuntaje(rs.getDouble("rating"));
+                pelicula.setPoster(rs.getString("poster"));
+                pelicula.setGenero(GeneroPelicula.valueOf(rs.getString("GENERO")));
+
+                peliculas.add(pelicula);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar las películas: " + e.getMessage());
+        }
+        return peliculas;
+    }
+
+    @Override
+    public List<Pelicula> peliculas10Random () {
+        List<Pelicula> peliculas = new ArrayList<>();
+        String sql = "SELECT * FROM PELICULA ORDER BY RANDOM() LIMIT 10";
+        Connection conn = ConexionBD.getConnection();
+
+        try (Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Pelicula pelicula = new Pelicula();
+                pelicula.setID(rs.getInt("ID"));
+                pelicula.setTitulo(rs.getString("TITULO"));
+                pelicula.setAnio(rs.getInt("anio"));
+                pelicula.setPuntaje(rs.getDouble("rating"));
+                pelicula.setPoster(rs.getString("poster"));
+                pelicula.setGenero(GeneroPelicula.valueOf(rs.getString("GENERO")));
+
+                peliculas.add(pelicula);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al listar las películas: " + e.getMessage());
+        }
+        return peliculas;
     }
 }

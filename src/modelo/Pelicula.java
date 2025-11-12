@@ -1,18 +1,14 @@
 package modelo;
 
-import java.time.Duration;
-import java.util.List;
-
 import enums.GeneroPelicula;
 
-import java.nio.file.Path;
 
 public class Pelicula extends Contenido {
-    private Duration duracion;
+    //private Duration duracion;
 
-    public Pelicula(String titulo, GeneroPelicula genero, String sinopsis, Staff director, double puntaje, int vistas, Path video, List<Reseña> reseñas, int ID, Duration duracion) {
-        super(titulo, genero, sinopsis, director, puntaje, vistas, video, reseñas, ID);
-        this.duracion = duracion;
+    public Pelicula(String titulo, GeneroPelicula genero, String sinopsis, double puntaje, int ID, String poster, int anio) {
+        super(titulo, genero, sinopsis, puntaje, ID, poster, anio);
+        //this.duracion = duracion;
     }
 
     public Pelicula() {
@@ -20,11 +16,7 @@ public class Pelicula extends Contenido {
     }
 
     // Getters y Setters
-    public Duration getDuracion() {
-        return duracion;
-    }
+    //public Duration getDuracion() { return duracion }
 
-    public void setDuracion(Duration duracion) {
-        this.duracion = duracion;
-    }
+    //public void setDuracion(Duration duracion) {this.duracion = duracion }
 }

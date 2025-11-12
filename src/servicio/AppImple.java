@@ -2,7 +2,6 @@ package servicio;
 
 import java.util.List;
 
-import comparador.ComparadorPeliculaDuracion;
 import comparador.ComparadorPeliculaGenero;
 import comparador.ComparadorPeliculaTitulo;
 import comparador.ComparadorUsuarioEmail;
@@ -14,7 +13,6 @@ import dao.ReseñaDAOimple;
 import dao.UsuarioDAO;
 import dao.UsuarioDAOimple;
 import database.ConexionBD;
-import modelo.Administrador;
 import modelo.Cliente;
 import modelo.Pelicula;
 import modelo.Reseña;
@@ -41,20 +39,6 @@ public class AppImple{
         }
     }
 
-    public void registrarAdmin(Administrador admin) {
-        System.out.println("\n--- Registrando Administrador ---");
-        if (this.usuarioDAO.guardar(admin)) {
-            System.out.println("Administrador registrado exitosamente.");
-        } else {
-            System.out.println("No se pudo registrar al administrador (el email ya podría existir).");
-        }
-    }
-
-    
-    public void cargarPelicula(Pelicula pelicula) {
-        this.peliculaDAO.guardar(pelicula);
-    }
-
     public void listarPeliculas(int orden) {
         List<Pelicula> peliculas = this.peliculaDAO.listarTodas();
         if (peliculas.isEmpty()) {
@@ -68,13 +52,10 @@ public class AppImple{
             case 2:
                 peliculas.sort(new ComparadorPeliculaGenero());
             break;
-            case 3:
-                peliculas.sort(new ComparadorPeliculaDuracion());
-            break;
         }
         System.out.println("\n--- Listado de Películas ---");
         for (Pelicula p : peliculas) {
-            System.out.printf("Título: %s | Género: %s | Duración: %d min\n", p.getTitulo(), p.getGenero(), p.getDuracion().toMinutes());
+            System.out.printf("Título: %s | Género: %s \n", p.getTitulo(), p.getGenero());
         }
     }
 
@@ -103,26 +84,30 @@ public class AppImple{
     public void registrarResena(Reseña reseña) {
         this.reseñaDAO.guardar(reseña);
     }
-
-    public void listarResenias() {
-        List<Reseña> reseñas = this.reseñaDAO.listarNoAprobadas();
-        if (reseñas.isEmpty()) {
-            System.out.println("No hay reseñas registradas.");
-            return;
-        }
-        System.out.println("\n--- Listado de Reseñas ---");
-        for (Reseña r : reseñas) {
-            System.out.printf("ID: %d | Usuario: %s | Película ID: %d | Comentario: %s | Puntaje: %d\n", r.getID(), r.getUsuario().getNombre(), r.getIDContenido(), r.getComentario(), r.getCalificacion());
-        }
-    }
     
-    
-    public void aprobarResena(int resenaID) {
-        this.reseñaDAO.aprobarResenia(resenaID);
-    }
-
     public boolean verificarDNI(long dni) {
         return this.usuarioDAO.dniExiste(dni);
     }
 
+    public Usuario login(String email, String password) {
+       Usuario usuarioLogueado = usuarioDAO.autenticar(email, password);
+        if (usuarioLogueado != null) {
+            System.out.println("Login exitoso. Bienvenido " + usuarioLogueado.getNombre());
+        } else {
+            System.out.println("Error: email o contraseña incorrectos.");
+        }
+        return usuarioLogueado;
+    }
+
+    public List<Pelicula> peliculasParaBienvenida(Cliente cliente) {
+        if (!clienteTieneResenas(cliente.getID())) {
+            return this.peliculaDAO.peliculasTop10Rank();
+        } else {
+            return this.peliculaDAO.peliculas10Random();
+        }
+    }
+
+    private boolean clienteTieneResenas(int clienteID) {
+        return this.reseñaDAO.existenResenasPorCliente(clienteID);
+    }   
 }

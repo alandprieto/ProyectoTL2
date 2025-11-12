@@ -6,18 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 import database.ConexionBD;
 import modelo.Reseña;
-import modelo.Usuario;
 
 public class ReseñaDAOimple implements ReseñaDAO {
 
     @Override
     public void guardar(Reseña resenia) {
-        String sql = "INSERT INTO RESENIA (CALIFICACION, COMENTARIO, FECHA_HORA, USUARIO, ID_PELICULA) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Resena (Puntaje, Comentario, FechaHora, UsuarioID, PeliculaID) VALUES (?, ?, ?, ?, ?)";
         Connection conn = ConexionBD.getConnection();
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -43,57 +40,6 @@ public class ReseñaDAOimple implements ReseñaDAO {
     }
 
     @Override
-    public List<Reseña> listarNoAprobadas() {
-        List<Reseña> resenias = new ArrayList<>();
-        String sql = "SELECT * FROM RESENIA WHERE APROBADO = 0";
-        Connection conn = ConexionBD.getConnection();
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()) {
-
-            UsuarioDAOimple usuarioDAO = new UsuarioDAOimple();
-
-            while (rs.next()) {
-                Reseña resenia = new Reseña();
-                resenia.setID(rs.getInt("ID"));
-                resenia.setCalificacion(rs.getInt("CALIFICACION"));
-                resenia.setComentario(rs.getString("COMENTARIO"));
-                resenia.setIDContenido(rs.getInt("ID_PELICULA"));
-
-                int idUsuario = rs.getInt("ID_USUARIO");
-                Usuario usuario = usuarioDAO.buscarPorId(idUsuario);
-                resenia.setUsuario(usuario);
-
-                resenias.add(resenia);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al listar reseñas no aprobadas: " + e.getMessage());
-        }
-        return resenias;
-    }
-
-    @Override
-    public void aprobarResenia(int idResenia) {
-        String sql = "UPDATE RESENIA SET APROBADO = 1 WHERE ID = ?";
-        Connection conn = ConexionBD.getConnection();
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, idResenia);
-            int filasAfectadas = pstmt.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                System.out.println("--> Reseña con ID " + idResenia + " aprobada correctamente.");
-            } else {
-                System.out.println("No se encontró una reseña con el ID " + idResenia + " para aprobar.");
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Error al aprobar la reseña: " + e.getMessage());
-        }
-    }
-
-    @Override
     public void eliminar(int idResenia) {
         String sql = "DELETE FROM RESENIA WHERE ID = ?";
         Connection conn = ConexionBD.getConnection();
@@ -112,5 +58,23 @@ public class ReseñaDAOimple implements ReseñaDAO {
         } catch (SQLException e) {
             System.err.println("Error al eliminar la reseña: " + e.getMessage());
         }
+    }
+
+    @Override
+    public boolean existenResenasPorCliente(int clienteID) {
+        String sql = "SELECT COUNT(*) AS total FROM RESENIA R JOIN USUARIO U ON R.UsuarioID = U.ID WHERE U.ID = ?";
+        Connection conn = ConexionBD.getConnection();
+        boolean existenResenas = false;
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, clienteID);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    existenResenas = rs.getInt("total") > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar reseñas por cliente: " + e.getMessage());
+        }
+        return existenResenas;
     }
 }

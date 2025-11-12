@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import database.ConexionBD;
-import modelo.Administrador;
 import modelo.Cliente;
 import modelo.Usuario;
 
@@ -16,7 +15,7 @@ public class UsuarioDAOimple implements UsuarioDAO {
 
     @Override
     public boolean guardar(Usuario usuario) {
-        String sql = "INSERT INTO USUARIO (DNI, NOMBRE, APELLIDO, EMAIL, CONTRASENA, ROL) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO USUARIO (DNI, NOMBRE, APELLIDO, EMAIL, CONTRASENA) VALUES (?, ?, ?, ?, ?, )";
         Connection conn = ConexionBD.getConnection();
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -26,12 +25,6 @@ public class UsuarioDAOimple implements UsuarioDAO {
             pstmt.setString(3, usuario.getApellido());
             pstmt.setString(4, usuario.getEmail());
             pstmt.setString(5, usuario.getContrasena());
-
-            if (usuario instanceof Administrador) {
-                pstmt.setString(6, "ADMIN");
-            } else {
-                pstmt.setString(6, "CLIENTE");
-            }
 
             int filasAfectadas = pstmt.executeUpdate();
 
@@ -64,17 +57,11 @@ public class UsuarioDAOimple implements UsuarioDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    String rol = rs.getString("ROL");
                     Long dni = rs.getLong("DNI");
                     String nombre = rs.getString("NOMBRE");
                     String apellido = rs.getString("APELLIDO");
 
-                    Usuario usuario;
-                    if ("ADMIN".equals(rol)) {
-                        usuario = new Administrador(dni, nombre, apellido, email, contrasena);
-                    } else {
-                        usuario = new Cliente(dni, nombre, apellido, email, contrasena);
-                    }
+                    Usuario usuario = new Cliente (dni, nombre, apellido, email, contrasena);
                     usuario.setID(rs.getInt("ID"));
                     return usuario;
                 }
@@ -95,19 +82,13 @@ public class UsuarioDAOimple implements UsuarioDAO {
                 ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                String rol = rs.getString("ROL");
                 Long dni = rs.getLong("DNI");
                 String nombre = rs.getString("NOMBRE");
                 String apellido = rs.getString("APELLIDO");
                 String email = rs.getString("EMAIL");
                 String contrasena = rs.getString("CONTRASENA");
 
-                Usuario usuario;
-                if ("ADMIN".equals(rol)) {
-                    usuario = new Administrador(dni, nombre, apellido, email, contrasena);
-                } else {
-                    usuario = new Cliente(dni, nombre, apellido, email, contrasena);
-                }
+                Usuario usuario = new Cliente (dni, nombre, apellido, email, contrasena);
                 usuario.setID(rs.getInt("ID"));
                 usuarios.add(usuario);
             }
@@ -127,19 +108,13 @@ public class UsuarioDAOimple implements UsuarioDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    String rol = rs.getString("ROL");
                     Long dni = rs.getLong("DNI");
                     String nombre = rs.getString("NOMBRE");
                     String apellido = rs.getString("APELLIDO");
                     String email = rs.getString("EMAIL");
                     String contrasena = "";
 
-                    Usuario usuario;
-                    if ("ADMIN".equals(rol)) {
-                        usuario = new Administrador(dni, nombre, apellido, email, contrasena);
-                    } else {
-                        usuario = new Cliente(dni, nombre, apellido, email, contrasena);
-                    }
+                    Usuario usuario = new Cliente (dni, nombre, apellido, email, contrasena);
                     usuario.setID(id);
                     return usuario;
                 }
@@ -171,93 +146,42 @@ public class UsuarioDAOimple implements UsuarioDAO {
     }
 
         public void actualizar(Usuario usuario) {
-
-            String sql = "UPDATE USUARIO SET DNI = ?, NOMBRE = ?, APELLIDO = ?, EMAIL = ?, CONTRASENA = ?, ROL = ? WHERE ID = ?";
-
+            String sql = "UPDATE USUARIO SET DNI = ?, NOMBRE = ?, APELLIDO = ?, EMAIL = ?, CONTRASENA = ? WHERE ID = ?";
             Connection conn = ConexionBD.getConnection();
-
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-    
-
                 pstmt.setLong(1, usuario.getDNI());
-
                 pstmt.setString(2, usuario.getNombre());
-
                 pstmt.setString(3, usuario.getApellido());
-
                 pstmt.setString(4, usuario.getEmail());
-
                 pstmt.setString(5, usuario.getContrasena());
-
-    
-
-                if (usuario instanceof Administrador) {
-
-                    pstmt.setString(6, "ADMIN");
-
-                } else {
-
-                    pstmt.setString(6, "CLIENTE");
-
-                }
-
-    
-
-                pstmt.setInt(7, usuario.getID());
-
+                pstmt.setInt(6, usuario.getID());
                 int filasAfectadas = pstmt.executeUpdate();
-
-    
-
                 if (filasAfectadas > 0) {
-
                     System.out.println("--> Usuario con ID " + usuario.getID() + " actualizado correctamente.");
-
                 } else {
-
                     System.out.println("No se encontró un usuario con el ID " + usuario.getID() + " para actualizar.");
-
                 }
-
-    
-
             } catch (SQLException e) {
-
                 System.err.println("Error al actualizar el usuario: " + e.getMessage());
 
             }
-
         }
 
     
 
         @Override
-
         public boolean dniExiste(long dni) {
-
             String sql = "SELECT 1 FROM USUARIO WHERE DNI = ?";
-
             Connection conn = ConexionBD.getConnection();
-
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
                 pstmt.setLong(1, dni);
-
                 try (ResultSet rs = pstmt.executeQuery()) {
-
                     return rs.next();
-
                 }
-
             } catch (SQLException e) {
-
                 System.err.println("Error al verificar si el DNI existe: " + e.getMessage());
-
             }
-
             return false;
-
         }
 
     }

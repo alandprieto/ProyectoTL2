@@ -10,4 +10,6 @@ public interface PeliculaDAO {
     boolean existePelicula(int id);
     void eliminar(int id);
     void actualizar(Pelicula pelicula);
+    List<Pelicula> peliculasTop10Rank();
+    List<Pelicula> peliculas10Random();
 }

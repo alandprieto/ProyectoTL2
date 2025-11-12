@@ -1,27 +1,20 @@
 package control;
 
-import java.time.Duration;
 import java.util.Scanner;
 
 import database.CargaDatosPrueba;
 import database.ConexionBD;
 import database.SetupBD;
-import enums.GeneroPelicula;
 import modelo.Usuario;
-import modelo.Administrador;
 import modelo.Cliente;
-import modelo.Pelicula;
 import modelo.Reseña;
 import servicio.AppImple;
-import dao.UsuarioDAO;
-import dao.UsuarioDAOimple;
-import modelo.Staff;
 import dao.PeliculaDAO;
 import dao.PeliculaDAOimple;
 import java.util.List;
+import modelo.Pelicula;
 
 public class App {
-    private UsuarioDAO usuarioDAO;
     private PeliculaDAO peliculaDAO;
     public static Scanner scanner = new Scanner(System.in);
     private AppImple servicio;
@@ -29,78 +22,47 @@ public class App {
 
     public static void main(String[] args) {
         SetupBD.crearTablas();
-        CargaDatosPrueba.cargarDatos();
+        CargaDatosPrueba.cargarPeliculasDesdeCSV();
         
         App app = new App();
-        app.usuarioDAO = new UsuarioDAOimple();
         app.peliculaDAO = new PeliculaDAOimple();
         app.servicio = new AppImple();
         
-        String TokenAdm = "zlra4142";
         int opcion = -1;
 
         try {
             while (opcion != 0) {
                 System.out.println("\n===== MENÚ PRINCIPAL =====");
-                System.out.println("1. Registrar un nuevo Cliente");
-                System.out.println("2. Registrar un nuevo Administrador");
-                System.out.println("3. Cargar una nueva Película (requiere ser admin)");
-                System.out.println("4. Listar todas las Peliculas");
-                System.out.println("5. Listar todos los Usuarios");
-                System.out.println("6. Registrar una Resena");
-                System.out.println("7. Aprobar una Resena");
+                System.out.println("1. Iniciar sesión");
+                System.out.println("2. Registrar un nuevo Cliente");
+                System.out.println("3. Listar todas las Peliculas");
+                System.out.println("4. Registrar una Resena");
                 System.out.println("0. Salir");
                 System.out.print("--> Seleccione una opcion: ");
                 try {
                     opcion = Integer.parseInt(scanner.nextLine());
                     switch (opcion) {
                         case 1:
+                            Usuario usuario = app.autenticarUsuario();
+                            break;
+                        case 2:
                             Cliente nuevoCliente = app.solicitarDatosCliente();
                             if (nuevoCliente != null) {
                                 app.servicio.registrarCliente(nuevoCliente);
                             }
                             break;
-                        case 2:
-                            Administrador nuevoAdmin = app.solicitarDatosAdmin(TokenAdm);
-                            if (nuevoAdmin != null) {
-                                app.servicio.registrarAdmin(nuevoAdmin);
-                            }
-                            break;
                         case 3:
-                            Usuario Admin = app.autenticarUsuarioPorRol(Administrador.class);
-                            if (Admin != null) {
-                                Pelicula nuevaPelicula = app.solicitarDatosPelicula();
-                                if (nuevaPelicula != null) {
-                                    app.servicio.cargarPelicula(nuevaPelicula);
-                                }
-                            }
-                            break;
-                        case 4:
-                            System.out.print("Ordenar por (1: Título, 2: Género, 3: Duración): ");
+                            System.out.print("Ordenar por (1: Título, 2: Género): ");
                             int orden = Integer.parseInt(scanner.nextLine());
                             app.servicio.listarPeliculas(orden);
                             break;
-                        case 5:
-                            System.out.print("Ordenar por (1: Nombre, 2: Email): ");
-                            int ordenUsuarios = Integer.parseInt(scanner.nextLine());
-                            app.servicio.listarUsuarios(ordenUsuarios);
-                            break;
-                        case 6:
-                            Usuario cliente = app.autenticarUsuarioPorRol(Cliente.class);
+                        case 4:
+                            Usuario cliente = app.autenticarUsuario();
                             if (cliente != null) {
                                 Reseña nuevaReseña = app.solicitarDatosResena(cliente);
                                 if (nuevaReseña != null) {
                                     app.servicio.registrarResena(nuevaReseña);
                                 }
-                            }
-                            break;
-                        case 7:
-                            Usuario admin = app.autenticarUsuarioPorRol(Administrador.class);
-                            if (admin != null){
-                                app.servicio.listarResenias();
-                                System.out.print("Ingrese el ID de la reseña a aprobar: ");
-                                int idResena = Integer.parseInt(scanner.nextLine());
-                                app.servicio.aprobarResena(idResena);
                             }
                             break;
                         case 0:
@@ -122,6 +84,16 @@ public class App {
         }scanner.close(); 
     }
 
+    public Usuario autenticarUsuario() { 
+        System.out.println("\n--- Autenticación de Usuario Requerida ---");
+        System.out.print("Ingrese su email: ");
+        String email = scanner.nextLine();
+        System.out.print("Ingrese su contraseña: ");
+        String contrasena = scanner.nextLine();
+        Usuario usuario = servicio.login(email, contrasena);
+        return usuario;
+    }
+
 
     public Cliente solicitarDatosCliente() {
         System.out.println("\n--- Registro de Nuevo Cliente ---");
@@ -132,26 +104,6 @@ public class App {
         
         return cliente;
     }
-
-
-    public Administrador solicitarDatosAdmin(String TokenAdm) {
-        System.out.print("Ingrese Token de validacion: ");
-        String TokenValido = scanner.nextLine();
-        if (!TokenValido.equals(TokenAdm)) { 
-            System.out.println("Error: Token no valido"); 
-            return null; 
-        }
-        else{
-            System.out.println("\n--- Registro de Nuevo Administrador ---");
-            Usuario datosUsuario = solicitarDatosUsuario();
-            if (datosUsuario == null) return null;
-
-            Administrador admin = new Administrador(datosUsuario.getDNI(), datosUsuario.getNombre(), datosUsuario.getApellido(), datosUsuario.getEmail(), datosUsuario.getContrasena());
-            
-            return admin;
-        }
-    }
-
 
     private Usuario solicitarDatosUsuario() {
         long DNI = 0;
@@ -228,79 +180,6 @@ public class App {
         
         return tieneNumero;
     }
-
-
-    public Usuario autenticarUsuarioPorRol(Class<? extends Usuario> tipoUsuarioEsperado) { 
-        System.out.println("\n--- Autenticación de Usuario Requerida ---");
-        System.out.print("Ingrese su email: ");
-        String email = scanner.nextLine();
-        System.out.print("Ingrese su contraseña: ");
-        String contrasena = scanner.nextLine();
-        Usuario usuario = this.usuarioDAO.autenticar(email, contrasena);
-        if (usuario == null) {
-            System.out.println("Error: Credenciales incorrectas.");
-            return null;
-        }
-        if (!tipoUsuarioEsperado.isInstance(usuario)) {
-            System.out.println("Error: Permisos insuficientes para esta acción.");
-            return null;
-        }
-        System.out.println("Autenticación exitosa. ¡Bienvenido, " + usuario.getNombre() + "!");
-        return usuario;
-    }
-
-
-    public Pelicula solicitarDatosPelicula() {
-        System.out.println("\n--- Carga de Nueva Película ---");
-        System.out.print("Ingrese título de la película: ");
-        String titulo = scanner.nextLine();
-
-        int generoInput = 0;
-        while (generoInput < 1 || generoInput > GeneroPelicula.values().length) {
-            System.out.print("Ingrese género (1: ACCION, 2: COMEDIA, 3: DRAMA, 4: CIENCIA_FICCION): ");
-            try {
-                generoInput = Integer.parseInt(scanner.nextLine());
-                if (generoInput < 1 || generoInput > GeneroPelicula.values().length) {
-                    System.out.println("Error: Opción de género no válida.");
-                }
-            }
-            catch (NumberFormatException e) {
-                System.out.println("Error: Ingrese un número para el género.");
-            }
-        }
-        GeneroPelicula genero = GeneroPelicula.values()[generoInput - 1];
-
-        System.out.print("Ingrese nombre del director: ");
-        String directorNombre = scanner.nextLine();
-        Staff director = new Staff(directorNombre, "Director");
-
-        int duracionMinutos = 0;
-        while (duracionMinutos <= 0) {
-            System.out.print("Ingrese duración en minutos: ");
-            try {
-                duracionMinutos = Integer.parseInt(scanner.nextLine());
-                if (duracionMinutos <= 0) {
-                    System.out.println("Error: La duración debe ser un número positivo.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Error: Ingrese un número válido para la duración.");
-            }
-        }
-        Duration duracion = Duration.ofMinutes(duracionMinutos);
-
-        Pelicula pelicula = new Pelicula(titulo, genero, "", director, 0.0, 0, null, null, 0, duracion);
-
-        System.out.printf("Titulo: %s | Género: %s | Director: %s | Duración: %d min\n", pelicula.getTitulo(), pelicula.getGenero(), pelicula.getDirector().getNombre(), pelicula.getDuracion().toMinutes());
-        System.out.println("¿La Película es correcta? [Y/N] ");
-        String confirmacion = scanner.nextLine().trim().toUpperCase();
-
-        if (!confirmacion.equals("Y")) {
-            System.out.println("Operación cancelada. La película no fue cargada.");
-            return null;
-        }
-        return pelicula;
-    }
-
 
     public Reseña solicitarDatosResena(Usuario usuario) {
         System.out.println("\n--- Registro de Nueva Reseña ---");
