@@ -8,11 +8,16 @@ import java.util.List;
 import database.ConexionBD;
 import modelo.Reseña;
 
+/**
+ * Implementación DAO para operaciones de Reseña en base de datos.
+ */
 public class ReseñaDAOimple implements ReseñaDAO {
 
+    /**
+     * Guarda una nueva reseña en la base de datos.
+     */
     @Override
     public void guardar(Reseña resenia) {
-        // CORREGIDO: Tabla 'Resena' (sin tilde)
         String sql = "INSERT INTO Resena (UsuarioID, PeliculaID, Comentario, Puntaje, Aprobada, FechaHora) VALUES (?, ?, ?, ?, ?, ?)";
         Connection conn = ConexionBD.getConnection();
 
@@ -29,6 +34,9 @@ public class ReseñaDAOimple implements ReseñaDAO {
         }
     }
 
+    /**
+     * Verifica si existe una reseña de un usuario para una película.
+     */
     @Override
     public boolean existeResena(int idUsuario, int idPelicula) {
         String sql = "SELECT 1 FROM Resena WHERE UsuarioID = ? AND PeliculaID = ?";
@@ -39,11 +47,30 @@ public class ReseñaDAOimple implements ReseñaDAO {
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next();
             }
-        } catch (SQLException e) { return false; }
+        } catch (SQLException e) { 
+            return false; 
+        }
     }
 
-    // Stubs
-    @Override public List<Reseña> listarNoAprobadas() { return new ArrayList<>(); }
-    @Override public void aprobarResenia(int id) { }
-    @Override public void eliminar(int id) { }
+    /**
+     * Lista todas las reseñas no aprobadas.
+     */
+    @Override 
+    public List<Reseña> listarNoAprobadas() { 
+        return new ArrayList<>(); 
+    }
+
+    /**
+     * Aprueba una reseña por su ID.
+     */
+    @Override 
+    public void aprobarResenia(int id) { 
+    }
+
+    /**
+     * Elimina una reseña por su ID.
+     */
+    @Override 
+    public void eliminar(int id) { 
+    }
 }

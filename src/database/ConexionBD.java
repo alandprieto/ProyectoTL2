@@ -4,13 +4,22 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Gestor de conexión a base de datos SQLite.
+ */
 public class ConexionBD {
     private static final String URL_SQLITE = "jdbc:sqlite:streaming.db";
     private static Connection connection = null;
 
+    /**
+     * Constructor privado para evitar instanciación.
+     */
     private ConexionBD() {
     }
 
+    /**
+     * Obtiene la conexión a la base de datos SQLite (singleton).
+     */
     public static Connection getConnection() {
         if (connection == null) {
             try {
@@ -24,6 +33,9 @@ public class ConexionBD {
         return connection;
     }
 
+    /**
+     * Cierra la conexión a la base de datos.
+     */
     public static void cerrarConexion() {
         if (connection != null) {
             try {
@@ -34,5 +46,4 @@ public class ConexionBD {
             }
         }
     }
-
 }

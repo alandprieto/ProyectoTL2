@@ -10,6 +10,9 @@ import java.nio.file.Path;
 public class Pelicula extends Contenido {
     private Duration duracion;
 
+    /**
+     * Constructor con todos los parámetros de película.
+     */
     public Pelicula(String titulo, GeneroPelicula genero, String sinopsis, Staff director, double puntaje, int vistas,
             Path video, List<Reseña> reseñas, int ID, Duration duracion, int anio, double ratingPromedio,
             String posterURL) {
@@ -17,15 +20,23 @@ public class Pelicula extends Contenido {
         this.duracion = duracion;
     }
 
+    /**
+     * Constructor vacío.
+     */
     public Pelicula() {
         super();
     }
 
-    // Getters y Setters
+    /**
+     * Obtiene la duración de la película.
+     */
     public Duration getDuracion() {
         return duracion;
     }
 
+    /**
+     * Establece la duración de la película.
+     */
     public void setDuracion(Duration duracion) {
         this.duracion = duracion;
     }

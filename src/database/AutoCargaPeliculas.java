@@ -13,10 +13,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Carga automáticamente las películas desde un archivo CSV a la base de datos.
+ */
 public class AutoCargaPeliculas {
 
+    /**
+     * Carga películas desde CSV si la base de datos está vacía.
+     */
     public static void cargarSiExiste(AppImple servicio) {
-        // 1. Verificar si ya hay datos
         if (servicio.hayPeliculasCargadas()) {
             System.out.println(">>> Base de datos con datos. No se requiere carga CSV.");
             return;
@@ -24,12 +29,11 @@ public class AutoCargaPeliculas {
 
         System.out.println(">>> Base de datos vacía. Iniciando búsqueda de CSV...");
 
-        // 2. Buscamos el archivo en varias rutas posibles para evitar errores
         File f = new File("src/database/movies_database.csv");
         if (!f.exists()) {
             f = new File("database/movies_database.csv");
             if (!f.exists()) {
-                f = new File("movies_database.csv"); // Intento en la raíz
+                f = new File("movies_database.csv");
             }
         }
 
@@ -42,13 +46,12 @@ public class AutoCargaPeliculas {
 
         System.out.println(">>> Archivo encontrado en: " + f.getAbsolutePath());
 
-        // 3. Leemos el archivo
         Connection conn = ConexionBD.getConnection();
         boolean previousAutoCommit = true;
         try {
             if (conn != null) {
                 previousAutoCommit = conn.getAutoCommit();
-                conn.setAutoCommit(false); // Mejor rendimiento al hacer muchas inserciones
+                conn.setAutoCommit(false);
             }
         } catch (SQLException se) {
             System.err.println("No se pudo desactivar autoCommit: " + se.getMessage());
@@ -59,13 +62,12 @@ public class AutoCargaPeliculas {
         int saltadas = 0;
 
         try (BufferedReader br = Files.newBufferedReader(f.toPath(), StandardCharsets.UTF_8)) {
-            String linea = br.readLine(); // Saltar cabecera
+            String linea = br.readLine();
 
             while ((linea = br.readLine()) != null) {
                 totales++;
                 List<String> datos = parseCSVLine(linea);
 
-                // Verificamos que la línea tenga suficientes datos (mínimo 8 columnas)
                 if (datos.size() < 8) {
                     saltadas++;
                     continue;
@@ -74,26 +76,21 @@ public class AutoCargaPeliculas {
                 try {
                     Pelicula p = new Pelicula();
 
-                    // Título (Columna 1)
                     p.setTitulo(datos.get(1).replace("\"", "").trim());
 
-                    // Año (Columna 0 - Fecha)
                     try {
                         p.setAnio(Integer.parseInt(datos.get(0).split("-")[0]));
                     } catch (Exception e) {
                         p.setAnio(2022);
                     }
 
-                    // Rating (Columna 5)
                     try {
                         p.setRatingPromedio(Double.parseDouble(datos.get(5)));
                     } catch (Exception e) {
                         p.setRatingPromedio(5.0);
                     }
 
-                    // Genero (Columna 7) - Limpiamos comillas y espacios
-                    String generoRaw = datos.get(7).replace("\"", "").trim().toUpperCase().split(",")[0].replace(" ",
-                            "_");
+                    String generoRaw = datos.get(7).replace("\"", "").trim().toUpperCase().split(",")[0].replace(" ", "_");
                     try {
                         if (generoRaw.contains("ACTION"))
                             p.setGenero(GeneroPelicula.ACCION);
@@ -111,26 +108,26 @@ public class AutoCargaPeliculas {
                         p.setGenero(GeneroPelicula.OTRO);
                     }
 
-                    // Poster (Columna 8)
                     if (datos.size() > 8) {
                         p.setPosterURL(datos.get(8).replace("\"", "").trim());
                     } else {
                         p.setPosterURL("");
                     }
 
-                    // Datos Dummy (no están en CSV o son complejos)
                     p.setDuracion(java.time.Duration.ofMinutes(120));
                     p.setDirector(new Staff("Director Desconocido", "Director"));
 
                     servicio.registrarPelicula(p);
                     cargadas++;
+                    
+                    if (cargadas % 100 == 0) {
+                        System.out.println(">>> Progreso: " + cargadas + " películas cargadas...");
+                    }
                 } catch (Exception ex) {
                     saltadas++;
-                    // Si falla una línea, seguimos con la siguiente
                 }
             }
 
-            // Commit de la transacción
             try {
                 if (conn != null)
                     conn.commit();
@@ -158,7 +155,9 @@ public class AutoCargaPeliculas {
         }
     }
 
-    // Parser CSV sencillo que maneja comillas y comas dentro de campos
+    /**
+     * Parsea una línea de CSV manejando comillas y comas dentro de campos.
+     */
     private static List<String> parseCSVLine(String line) {
         List<String> result = new ArrayList<>();
         if (line == null)
@@ -168,10 +167,9 @@ public class AutoCargaPeliculas {
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
             if (c == '"') {
-                // Si es comilla y la siguiente también es comilla, es una comilla escapada
                 if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
                     cur.append('"');
-                    i++; // saltar la siguiente comilla
+                    i++;
                 } else {
                     inQuotes = !inQuotes;
                 }

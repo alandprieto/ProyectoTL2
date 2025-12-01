@@ -5,7 +5,7 @@ import servicio.AppImple;
 import vista.VistaLogin;
 import vista.VistaPrincipal;
 import vista.VistaRegistro;
-import excepciones.CredencialesInvalidasException; // Excepción Propia
+import excepciones.CredencialesInvalidasException;
 import database.AutoCargaPeliculas;
 import javax.swing.JDialog;
 import javax.swing.JProgressBar;
@@ -19,6 +19,9 @@ public class ControladorLogin implements ActionListener {
     private AppImple servicio;
     private VistaLogin vistaLogin;
 
+    /**
+     * Construye el controlador de login e inicializa los listeners.
+     */
     public ControladorLogin(AppImple servicio, VistaLogin vistaLogin) {
         this.servicio = servicio;
         this.vistaLogin = vistaLogin;
@@ -26,6 +29,9 @@ public class ControladorLogin implements ActionListener {
         this.vistaLogin.btnRegistrar.addActionListener(this);
     }
 
+    /**
+     * Maneja los eventos de los botones de login y registro.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == vistaLogin.btnIngresar) {
@@ -38,16 +44,17 @@ public class ControladorLogin implements ActionListener {
         }
     }
 
+    /**
+     * Procesa el intento de login del usuario.
+     */
     private void procesarLogin() {
         String email = vistaLogin.txtEmail.getText();
         String pass = new String(vistaLogin.txtPassword.getPassword());
 
         try {
-            // Lanza excepción si falla
             Usuario u = servicio.autenticarUsuario(email, pass);
             JOptionPane.showMessageDialog(vistaLogin, "Bienvenido " + u.getNombre());
 
-            // Si ya hay películas cargadas, abrimos la app directamente
             if (servicio.hayPeliculasCargadas()) {
                 vistaLogin.cerrar();
                 VistaPrincipal vp = new VistaPrincipal();
@@ -56,7 +63,6 @@ public class ControladorLogin implements ActionListener {
                 return;
             }
 
-            // Mostramos diálogo modal de carga y ejecutamos la carga en background
             final JDialog dialog = new JDialog(vistaLogin, "Cargando, por favor aguarde...", true);
             dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             dialog.setSize(300, 100);
@@ -69,6 +75,11 @@ public class ControladorLogin implements ActionListener {
                 @Override
                 protected Void doInBackground() throws Exception {
                     AutoCargaPeliculas.cargarSiExiste(servicio);
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
                     return null;
                 }
 
@@ -86,7 +97,6 @@ public class ControladorLogin implements ActionListener {
             dialog.setVisible(true);
 
         } catch (CredencialesInvalidasException ex) {
-            // Manejo de Excepción Propia
             JOptionPane.showMessageDialog(vistaLogin, ex.getMessage(), "Error Login", JOptionPane.ERROR_MESSAGE);
         }
     }

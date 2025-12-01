@@ -4,7 +4,7 @@ import modelo.Cliente;
 import servicio.AppImple;
 import vista.VistaRegistro;
 import vista.VistaLogin;
-import excepciones.UsuarioYaExisteException; // Excepción Propia
+import excepciones.UsuarioYaExisteException;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -15,6 +15,9 @@ public class ControladorRegistro implements ActionListener {
     private VistaRegistro vistaReg;
     private VistaLogin vistaLogin;
 
+    /**
+     * Construye el controlador de registro e inicializa los listeners.
+     */
     public ControladorRegistro(AppImple servicio, VistaRegistro vistaReg, VistaLogin vistaLogin) {
         this.servicio = servicio;
         this.vistaReg = vistaReg;
@@ -36,7 +39,7 @@ public class ControladorRegistro implements ActionListener {
                 if(nom.isEmpty() || email.isEmpty()) throw new Exception("Campos vacíos");
 
                 Cliente c = new Cliente(dni, nom, ape, email, pass);
-                servicio.registrarCliente(c); // Puede lanzar UsuarioYaExisteException
+                servicio.registrarCliente(c);
 
                 JOptionPane.showMessageDialog(vistaReg, "Registrado!");
                 vistaReg.cerrar();

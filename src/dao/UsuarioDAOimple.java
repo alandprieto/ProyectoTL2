@@ -13,12 +13,16 @@ import modelo.Administrador;
 import modelo.Cliente;
 import modelo.Usuario;
 
+/**
+ * Implementación DAO para operaciones de Usuario en base de datos.
+ */
 public class UsuarioDAOimple implements UsuarioDAO {
 
+    /**
+     * Guarda un nuevo usuario en la base de datos.
+     */
     @Override
     public boolean guardar(Usuario usuario) {
-        // CORREGIDO: Nombres de columnas exactos como en SetupBD
-        // CORREGIDO: Usamos TipoUsuario en lugar de ROL
         String sql = "INSERT INTO Usuario (DNI, Nombre, Apellido, Email, Contrasena, TipoUsuario) VALUES (?, ?, ?, ?, ?, ?)";
         Connection conn = ConexionBD.getConnection();
 
@@ -44,14 +48,17 @@ public class UsuarioDAOimple implements UsuarioDAO {
                         usuario.setID(generatedKeys.getInt(1));
                     }
                 }
-                return true; // ¡ÉXITO!
+                return true;
             }
         } catch (SQLException e) {
             System.err.println("Error al guardar usuario: " + e.getMessage());
         }
-        return false; // FALLÓ
+        return false;
     }
 
+    /**
+     * Busca un usuario por su ID.
+     */
     @Override
     public Usuario buscarPorId(int id) {
         String sql = "SELECT * FROM Usuario WHERE ID = ?";
@@ -70,6 +77,9 @@ public class UsuarioDAOimple implements UsuarioDAO {
         return null;
     }
 
+    /**
+     * Lista todos los usuarios de la base de datos.
+     */
     @Override
     public List<Usuario> listarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
@@ -91,6 +101,9 @@ public class UsuarioDAOimple implements UsuarioDAO {
         return usuarios;
     }
 
+    /**
+     * Elimina un usuario por su ID.
+     */
     @Override
     public void eliminar(int id) {
         String sql = "DELETE FROM Usuario WHERE ID = ?";
@@ -109,9 +122,11 @@ public class UsuarioDAOimple implements UsuarioDAO {
         }
     }
 
+    /**
+     * Autentica un usuario con email y contraseña.
+     */
     @Override
     public Usuario autenticar(String email, String contrasena) {
-        // CORREGIDO: Email y Contrasena (Capitalizados)
         String sql = "SELECT * FROM Usuario WHERE Email = ? AND Contrasena = ?";
         Connection conn = ConexionBD.getConnection();
 
@@ -130,9 +145,11 @@ public class UsuarioDAOimple implements UsuarioDAO {
         return null;
     }
 
+    /**
+     * Verifica si un DNI ya existe en la base de datos.
+     */
     @Override
     public boolean dniExiste(long dni) {
-        // CORREGIDO: DNI en mayúsculas (o como esté en SetupBD, normalmente es DNI)
         String sql = "SELECT 1 FROM Usuario WHERE DNI = ?";
         Connection conn = ConexionBD.getConnection();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -146,10 +163,11 @@ public class UsuarioDAOimple implements UsuarioDAO {
         }
     }
 
-    // --- MÉTODO NUEVO QUE DABA ERROR ---
+    /**
+     * Verifica si un email ya existe en la base de datos.
+     */
     @Override
     public boolean emailExiste(String email) {
-        // CORREGIDO: "Email" en lugar de "EMAIL"
         String sql = "SELECT 1 FROM Usuario WHERE Email = ?";
         Connection conn = ConexionBD.getConnection();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -163,6 +181,9 @@ public class UsuarioDAOimple implements UsuarioDAO {
         }
     }
 
+    /**
+     * Verifica si el usuario ya vio el Top 10.
+     */
     @Override
     public boolean haVistoTop10(int id) {
         String sql = "SELECT VioTop10 FROM Usuario WHERE ID = ?";
@@ -182,6 +203,9 @@ public class UsuarioDAOimple implements UsuarioDAO {
         return false;
     }
 
+    /**
+     * Marca que el usuario vio el Top 10.
+     */
     @Override
     public void marcarVioTop10(int id) {
         String sql = "UPDATE Usuario SET VioTop10 = 1 WHERE ID = ?";
@@ -195,10 +219,10 @@ public class UsuarioDAOimple implements UsuarioDAO {
         }
     }
 
-    // Método auxiliar para mapear ResultSet a objeto
+    /**
+     * Mapea un ResultSet a un objeto Usuario.
+     */
     private Usuario mapResultSetToUsuario(ResultSet rs) throws SQLException {
-        // CORREGIDO: Usamos TipoUsuario y las columnas con la mayúscula inicial
-        // correcta
         String tipo = rs.getString("TipoUsuario");
         Usuario usuario = null;
 
@@ -218,7 +242,6 @@ public class UsuarioDAOimple implements UsuarioDAO {
             int v = rs.getInt("VioTop10");
             usuario.setVistoTop10(v == 1);
         } catch (SQLException ex) {
-            // Si la columna no existe en versiones antiguas, dejamos el default false
         }
 
         return usuario;

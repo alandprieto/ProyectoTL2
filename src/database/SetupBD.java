@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Inicializa y configura la estructura de la base de datos.
+ */
 public class SetupBD {
 
     private static final String CREATE_USUARIO = "CREATE TABLE IF NOT EXISTS Usuario (" +
@@ -39,6 +42,9 @@ public class SetupBD {
             "  FOREIGN KEY(PeliculaID) REFERENCES Pelicula(ID)" +
             ");";
 
+    /**
+     * Crea las tablas necesarias en la base de datos si no existen.
+     */
     public static void crearTablas() {
         Connection conn = ConexionBD.getConnection();
         if (conn == null) {
@@ -53,8 +59,6 @@ public class SetupBD {
             stmt.execute(CREATE_RESENA);
             System.out.println("Tablas creadas o ya existentes.");
 
-            // Aseguramos que la columna VioTop10 exista (para migraciones desde versiones
-            // antiguas)
             boolean tieneVioTop10 = false;
             try (java.sql.ResultSet rs = stmt.executeQuery("PRAGMA table_info(Usuario);")) {
                 while (rs.next()) {

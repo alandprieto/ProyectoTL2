@@ -4,9 +4,13 @@ import modelo.Pelicula;
 import modelo.Reseña;
 import modelo.Usuario;
 import servicio.AppImple;
+import servicio.ConsultaPeliculasOMDb;
 import vista.VistaPrincipal;
 import vista.VistaLogin;
+import vista.VistaDetallesPelicula;
 import excepciones.DatoInvalidoException;
+import comparador.ComparadorPeliculaGenero;
+import comparador.ComparadorPeliculaTitulo;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,13 +20,18 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.List;
+import org.json.JSONObject;
 
 public class ControladorPrincipal implements ActionListener {
     private AppImple servicio;
     private VistaPrincipal vista;
     private Usuario usuario;
-    private List<Pelicula> peliculasActuales; // Guarda el listado actual para refrescar
+    private List<Pelicula> peliculasActuales;
 
+    /**
+     * Inicializa el controlador principal con la vista y el servicio.
+     * Muestra el Top 10 en la primera entrada del usuario o películas aleatorias si ya lo vio.
+     */
     public ControladorPrincipal(AppImple servicio, VistaPrincipal vista, Usuario usuario) {
         this.servicio = servicio;
         this.vista = vista;
@@ -31,10 +40,10 @@ public class ControladorPrincipal implements ActionListener {
         this.vista.btnBuscar.addActionListener(this);
         this.vista.btnExplorar.addActionListener(this);
         this.vista.btnCerrarSesion.addActionListener(this);
-        // Título siempre muestra el nombre del usuario
+        this.vista.btnOrdenarGenero.addActionListener(this);
+        this.vista.btnOrdenarTitulo.addActionListener(this);
         this.vista.setTitle("Streaming - Usuario: " + usuario.getNombre());
 
-        // Si el usuario nunca vio el Top10, mostramos un cartel de bienvenida + Top10
         boolean yaVio = false;
         try {
             yaVio = servicio.haVistoTop10(usuario.getID()) || usuario.isVistoTop10();
@@ -43,7 +52,6 @@ public class ControladorPrincipal implements ActionListener {
         }
 
         if (!yaVio) {
-            // Mostrar cartel de bienvenida
             String mensaje = "BIENVENIDO: sabemos que te gustan las peliculas, aca estan las 10 mejores de nuestra plataforma ¡calificalas!";
             try {
                 if (vista.lblBienvenida != null) {
@@ -55,7 +63,6 @@ public class ControladorPrincipal implements ActionListener {
             }
 
             cargarPeliculas(servicio.obtenerTop10Peliculas());
-            // Marcamos que ya se le mostró para futuras entradas (DB + objeto en memoria)
             try {
                 servicio.marcarVioTop10(usuario.getID());
                 usuario.setVistoTop10(true);
@@ -63,7 +70,6 @@ public class ControladorPrincipal implements ActionListener {
                 System.err.println("No se pudo marcar VioTop10: " + ex.getMessage());
             }
         } else {
-            // Ocultar cartel si existía y mostrar aleatorias
             if (vista.lblBienvenida != null) {
                 vista.lblBienvenida.setVisible(false);
             }
@@ -71,22 +77,70 @@ public class ControladorPrincipal implements ActionListener {
         }
     }
 
+    /**
+     * Maneja los eventos de los botones principales: Buscar, Explorar, Cerrar Sesión y Ordenamiento.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == vista.btnBuscar) {
-            // Ocultar banner si está visible antes de mostrar resultados
             if (vista.lblBienvenida != null && vista.lblBienvenida.isVisible()) {
                 vista.lblBienvenida.setVisible(false);
             }
-            String q = vista.txtBusqueda.getText();
-            cargarPeliculas(servicio.buscarPeliculasPorTitulo(q));
+            String q = vista.txtBusqueda.getText().trim();
+            
+            if (q.isEmpty()) {
+                JOptionPane.showMessageDialog(vista, "Por favor ingresa un término de búsqueda.");
+                return;
+            }
+            
+            JDialog dialogoCarga = new JDialog(vista, "Buscando en OMDb...", true);
+            dialogoCarga.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            dialogoCarga.setSize(300, 100);
+            dialogoCarga.setLocationRelativeTo(vista);
+            JProgressBar progress = new JProgressBar();
+            progress.setIndeterminate(true);
+            dialogoCarga.add(progress);
+            
+            new Thread(() -> {
+                JSONObject datosPelicula = ConsultaPeliculasOMDb.consultarPelicula(q);
+                
+                SwingUtilities.invokeLater(() -> {
+                    dialogoCarga.dispose();
+                    
+                    if (datosPelicula != null) {
+                        String titulo = ConsultaPeliculasOMDb.obtenerTitulo(datosPelicula);
+                        String anio = ConsultaPeliculasOMDb.obtenerAnio(datosPelicula);
+                        String sinopsis = ConsultaPeliculasOMDb.obtenerSinopsis(datosPelicula);
+                        String rating = ConsultaPeliculasOMDb.obtenerRating(datosPelicula);
+                        
+                        VistaDetallesPelicula ventanaDetalles = new VistaDetallesPelicula(
+                                vista, titulo, anio, sinopsis, rating);
+                        ventanaDetalles.mostrar();
+                    } else {
+                        JOptionPane.showMessageDialog(vista,
+                                "No se encontró la película '" + q + "' en OMDb.",
+                                "Sin resultados", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                });
+            }).start();
+            
+            dialogoCarga.setVisible(true);
         } else if (e.getSource() == vista.btnExplorar) {
             if (vista.lblBienvenida != null && vista.lblBienvenida.isVisible()) {
                 vista.lblBienvenida.setVisible(false);
             }
             cargarPeliculas(servicio.obtenerPeliculasExplorar());
+        } else if (e.getSource() == vista.btnOrdenarGenero) {
+            if (peliculasActuales != null) {
+                peliculasActuales.sort(new ComparadorPeliculaGenero());
+                cargarPeliculas(peliculasActuales);
+            }
+        } else if (e.getSource() == vista.btnOrdenarTitulo) {
+            if (peliculasActuales != null) {
+                peliculasActuales.sort(new ComparadorPeliculaTitulo());
+                cargarPeliculas(peliculasActuales);
+            }
         } else if (e.getSource() == vista.btnCerrarSesion) {
-            // Cerrar sesión: volver a la vista de login
             try {
                 VistaLogin vLogin = new VistaLogin();
                 new ControladorLogin(servicio, vLogin);
@@ -94,19 +148,22 @@ public class ControladorPrincipal implements ActionListener {
             } catch (Exception ex) {
                 System.err.println("Error al abrir login: " + ex.getMessage());
             }
-            // Cerramos la ventana actual
             vista.dispose();
         }
     }
 
+    /**
+     * Carga una lista de películas en la vista principal.
+     * Muestra el poster, título, género, rating y botón para calificar de cada película.
+     */
     private void cargarPeliculas(List<Pelicula> peliculas) {
-        this.peliculasActuales = peliculas; // Guardar para refrescar después
+        this.peliculasActuales = peliculas;
         vista.panelResultados.removeAll();
         for (Pelicula p : peliculas) {
             JPanel tarjeta = new JPanel();
             tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
             tarjeta.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            tarjeta.setPreferredSize(new Dimension(180, 320));
+            tarjeta.setPreferredSize(new Dimension(180, 350));
 
             JLabel lblImg = new JLabel("Cargando...");
             lblImg.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -114,6 +171,12 @@ public class ControladorPrincipal implements ActionListener {
 
             JLabel lblTitulo = new JLabel("<html><center>" + p.getTitulo() + "</center></html>");
             lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lblTitulo.setFont(new Font("Arial", Font.BOLD, 12));
+
+            JLabel lblGenero = new JLabel("<html><center>" + (p.getGenero() != null ? p.getGenero().name().replace("_", " ") : "SIN GÉNERO") + "</center></html>");
+            lblGenero.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lblGenero.setFont(new Font("Arial", Font.ITALIC, 10));
+            lblGenero.setForeground(new Color(100, 100, 100));
 
             JLabel lblRating = new JLabel("★ " + p.getRatingPromedio() + "/10");
             lblRating.setForeground(new Color(255, 140, 0));
@@ -122,7 +185,6 @@ public class ControladorPrincipal implements ActionListener {
             JButton btnVotar = new JButton("Calificar");
             btnVotar.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // Verificar si el usuario ya calificó esta película
             if (servicio.yaCalificoUsuario(usuario.getID(), p.getID())) {
                 btnVotar.setText("Ya calificada");
                 btnVotar.setEnabled(false);
@@ -134,6 +196,7 @@ public class ControladorPrincipal implements ActionListener {
             tarjeta.add(lblImg);
             tarjeta.add(Box.createVerticalStrut(5));
             tarjeta.add(lblTitulo);
+            tarjeta.add(lblGenero);
             tarjeta.add(lblRating);
             tarjeta.add(Box.createVerticalStrut(5));
             tarjeta.add(btnVotar);
@@ -144,19 +207,21 @@ public class ControladorPrincipal implements ActionListener {
         vista.panelResultados.repaint();
     }
 
+    /**
+     * Muestra un diálogo para que el usuario califique una película.
+     * Solicita puntaje (1-10) y comentario obligatorio.
+     */
     private void mostrarDialogoCalificacion(Pelicula p) {
         JDialog dialogo = new JDialog(vista, "Calificar: " + p.getTitulo(), true);
-        dialogo.setSize(500, 350); // Un poco más alto para que entre todo bien
+        dialogo.setSize(500, 350);
         dialogo.setLocationRelativeTo(vista);
         dialogo.setLayout(new BorderLayout());
 
-        // 1. Título
         JLabel lblTitulo = new JLabel("Selecciona tu puntuación:", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
         lblTitulo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         dialogo.add(lblTitulo, BorderLayout.NORTH);
 
-        // 2. Botones 1-10
         JPanel panelBotones = new JPanel(new GridLayout(2, 5, 5, 5));
         panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
@@ -172,12 +237,10 @@ public class ControladorPrincipal implements ActionListener {
         }
         dialogo.add(panelBotones, BorderLayout.CENTER);
 
-        // 3. Comentario + Botón
         JPanel panelSur = new JPanel(new BorderLayout());
         panelSur.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 
         JTextArea txtComentario = new JTextArea(4, 20);
-        // CAMBIO VISUAL: Indicamos que es obligatorio
         txtComentario.setBorder(BorderFactory.createTitledBorder("Tu comentario (Obligatorio)"));
         txtComentario.setLineWrap(true);
         txtComentario.setWrapStyleWord(true);
@@ -187,15 +250,12 @@ public class ControladorPrincipal implements ActionListener {
         btnGuardar.setBackground(new Color(50, 150, 50));
         btnGuardar.setForeground(Color.WHITE);
 
-        // --- LÓGICA DEL BOTÓN ---
         btnGuardar.addActionListener(e -> {
-            // Validación 1: Puntaje
             if (puntajeSeleccionado[0] == 0) {
                 JOptionPane.showMessageDialog(dialogo, "Por favor selecciona un puntaje del 1 al 10.");
                 return;
             }
 
-            // Validación 2: Comentario (CAMBIO SOLICITADO)
             String textoComentario = txtComentario.getText().trim();
             if (textoComentario.isEmpty()) {
                 JOptionPane.showMessageDialog(dialogo, "El comentario es obligatorio para enviar la reseña.",
@@ -214,6 +274,10 @@ public class ControladorPrincipal implements ActionListener {
         dialogo.setVisible(true);
     }
 
+    /**
+     * Guarda la reseña del usuario en la base de datos.
+     * Actualiza el rating de la película y refresca la vista.
+     */
     private void guardarResena(Pelicula p, String comentario, int puntaje, JDialog dialogo) {
         try {
             Reseña r = new Reseña(usuario, p.getID(), comentario, puntaje);
@@ -221,7 +285,6 @@ public class ControladorPrincipal implements ActionListener {
             JOptionPane.showMessageDialog(vista, "¡Gracias! Tu reseña ha sido guardada.");
             dialogo.dispose();
 
-            // Refrescar el listado actual para que el botón se actualice a "Ya calificada"
             if (peliculasActuales != null) {
                 cargarPeliculas(peliculasActuales);
             }
@@ -233,6 +296,10 @@ public class ControladorPrincipal implements ActionListener {
         }
     }
 
+    /**
+     * Carga el poster de una película de forma asíncrona en un hilo aparte.
+     * Evita bloquear la interfaz mientras se descarga la imagen.
+     */
     private void cargarImagenAsync(String urlString, JLabel labelDestino) {
         Thread hilo = new Thread(() -> {
             try {

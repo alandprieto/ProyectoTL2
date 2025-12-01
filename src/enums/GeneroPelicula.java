@@ -1,5 +1,8 @@
 package enums;
 
+/**
+ * Enumeración de géneros de películas.
+ */
 public enum GeneroPelicula {
     ACCION,
     COMEDIA,

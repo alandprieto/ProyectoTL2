@@ -3,19 +3,27 @@ package vista;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Ventana principal de la aplicación de streaming.
+ */
 public class VistaPrincipal extends JFrame {
 
     public JTextField txtBusqueda;
     public JButton btnBuscar;
-    public JButton btnExplorar; // <--- RENOMBRADO (Antes btnVerTodas)
+    public JButton btnExplorar;
     public JButton btnCargarPeliculas;
     public JButton btnAdmin;
     public JButton btnCerrarSesion;
+    public JButton btnOrdenarGenero;
+    public JButton btnOrdenarTitulo;
 
     public JPanel panelResultados;
     public JScrollPane scrollResultados;
     public JLabel lblBienvenida;
 
+    /**
+     * Constructor que inicializa la interfaz principal.
+     */
     public VistaPrincipal() {
         this.setTitle("ALTI - Tu Plataforma de Streaming favorita");
         this.setSize(1000, 700);
@@ -23,7 +31,6 @@ public class VistaPrincipal extends JFrame {
         this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
 
-        // --- Panel Superior ---
         JPanel panelSuperior = new JPanel();
         panelSuperior.setLayout(new FlowLayout(FlowLayout.LEFT));
         panelSuperior.setBackground(Color.DARK_GRAY);
@@ -34,11 +41,13 @@ public class VistaPrincipal extends JFrame {
         txtBusqueda = new JTextField(20);
         btnBuscar = new JButton("Buscar");
 
-        // CAMBIO AQUÍ: Texto y variable del botón
         btnExplorar = new JButton("Explorar (Aleatorias)");
 
         btnCargarPeliculas = new JButton("Cargar Películas (CSV)");
         btnCargarPeliculas.setVisible(false);
+
+        btnOrdenarGenero = new JButton("Ordenar por Género");
+        btnOrdenarTitulo = new JButton("Ordenar por Título");
 
         btnAdmin = new JButton("Panel Admin");
         btnCerrarSesion = new JButton("Cerrar Sesión");
@@ -46,12 +55,13 @@ public class VistaPrincipal extends JFrame {
         panelSuperior.add(lblBuscar);
         panelSuperior.add(txtBusqueda);
         panelSuperior.add(btnBuscar);
-        panelSuperior.add(btnExplorar); // Agregamos el botón renombrado
+        panelSuperior.add(btnExplorar);
+        panelSuperior.add(btnOrdenarGenero);
+        panelSuperior.add(btnOrdenarTitulo);
         panelSuperior.add(btnCargarPeliculas);
         panelSuperior.add(btnAdmin);
         panelSuperior.add(btnCerrarSesion);
 
-        // Contenedor superior: panel con el panelSuperior y el lblBienvenida debajo
         JPanel topContainer = new JPanel();
         topContainer.setLayout(new BorderLayout());
         topContainer.add(panelSuperior, BorderLayout.NORTH);
@@ -65,7 +75,6 @@ public class VistaPrincipal extends JFrame {
         lblBienvenida.setVisible(false);
         topContainer.add(lblBienvenida, BorderLayout.SOUTH);
 
-        // --- Panel Central ---
         panelResultados = new JPanel();
         panelResultados.setLayout(new GridLayout(0, 4, 10, 10));
         panelResultados.setBackground(new Color(240, 240, 240));
@@ -75,11 +84,13 @@ public class VistaPrincipal extends JFrame {
         scrollResultados.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollResultados.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        // Añadimos el contenedor superior que incluye la barra y el banner
         this.add(topContainer, BorderLayout.NORTH);
         this.add(scrollResultados, BorderLayout.CENTER);
     }
 
+    /**
+     * Inicializa y muestra la ventana principal.
+     */
     public void iniciar() {
         this.setVisible(true);
     }
