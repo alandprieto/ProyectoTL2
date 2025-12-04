@@ -120,9 +120,9 @@ compile.bat                  # Script de compilación
    java -cp "bin;lib/*" controlador.AppGUI
    ```
 
-3. **Credenciales de Prueba:**
-   - Usuario: `admin1@streaming.com` / Contraseña: `admin123` (Admin)
-   - Usuario: `usuario@gmail.com` / Contraseña: `user123` (Cliente)
+3. **Credenciales de Prueba (para corrección):**
+   - **Cliente (PRINCIPAL):** `alan@gmail.com` / Contraseña: `12345678`
+   - Admin: `admin1@streaming.com` / Contraseña: `admin123`
 
 ## Cambios Realizados en Esta Versión
 
