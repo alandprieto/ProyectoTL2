@@ -12,7 +12,6 @@ public class VistaPrincipal extends JFrame {
     public JButton btnBuscar;
     public JButton btnExplorar;
     public JButton btnCargarPeliculas;
-    public JButton btnAdmin;
     public JButton btnCerrarSesion;
     public JButton btnOrdenarGenero;
     public JButton btnOrdenarTitulo;
@@ -49,7 +48,6 @@ public class VistaPrincipal extends JFrame {
         btnOrdenarGenero = new JButton("Ordenar por Género");
         btnOrdenarTitulo = new JButton("Ordenar por Título");
 
-        btnAdmin = new JButton("Panel Admin");
         btnCerrarSesion = new JButton("Cerrar Sesión");
 
         panelSuperior.add(lblBuscar);
@@ -59,7 +57,6 @@ public class VistaPrincipal extends JFrame {
         panelSuperior.add(btnOrdenarGenero);
         panelSuperior.add(btnOrdenarTitulo);
         panelSuperior.add(btnCargarPeliculas);
-        panelSuperior.add(btnAdmin);
         panelSuperior.add(btnCerrarSesion);
 
         JPanel topContainer = new JPanel();

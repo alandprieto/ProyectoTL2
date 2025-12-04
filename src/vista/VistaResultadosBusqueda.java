@@ -104,92 +104,47 @@ public class VistaResultadosBusqueda extends JDialog {
      * Muestra una ventana modal con los detalles completos de una película desde OMDb.
      */
     private void mostrarSinopsis(Pelicula p) {
-        JDialog dialogo = new JDialog(this, "Detalles: " + p.getTitulo(), true);
-        dialogo.setSize(500, 400);
-        dialogo.setLocationRelativeTo(this);
-        dialogo.setLayout(new BorderLayout(10, 10));
-
-        JLabel lblCargando = new JLabel("Consultando información...", SwingConstants.CENTER);
-        lblCargando.setFont(new Font("Arial", Font.ITALIC, 14));
-        dialogo.add(lblCargando, BorderLayout.CENTER);
-        dialogo.setVisible(true);
+        // Reutiliza la ventana `VistaDetallesPelicula` para evitar duplicación de UI.
+        JDialog dialogoCarga = new JDialog(this, "Consultando OMDb...", true);
+        dialogoCarga.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialogoCarga.setSize(300, 100);
+        dialogoCarga.setLocationRelativeTo(this);
+        JProgressBar progress = new JProgressBar();
+        progress.setIndeterminate(true);
+        dialogoCarga.add(progress);
 
         new Thread(() -> {
             try {
                 JSONObject datosPelicula = ConsultaPeliculasOMDb.consultarPelicula(p.getTitulo());
-                
-                String titulo = ConsultaPeliculasOMDb.obtenerTitulo(datosPelicula);
-                String anio = ConsultaPeliculasOMDb.obtenerAnio(datosPelicula);
-                String sinopsis = ConsultaPeliculasOMDb.obtenerSinopsis(datosPelicula);
-                
+
                 SwingUtilities.invokeLater(() -> {
-                    dialogo.getContentPane().removeAll();
+                    dialogoCarga.dispose();
 
-                    JPanel panelTitulo = new JPanel();
-                    panelTitulo.setLayout(new BoxLayout(panelTitulo, BoxLayout.Y_AXIS));
-                    panelTitulo.setBackground(new Color(50, 100, 150));
-                    panelTitulo.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+                    if (datosPelicula != null) {
+                        String titulo = ConsultaPeliculasOMDb.obtenerTitulo(datosPelicula);
+                        String anio = ConsultaPeliculasOMDb.obtenerAnio(datosPelicula);
+                        String sinopsis = ConsultaPeliculasOMDb.obtenerSinopsis(datosPelicula);
+                        String rating = ConsultaPeliculasOMDb.obtenerRating(datosPelicula);
 
-                    JLabel lblTit = new JLabel(titulo);
-                    lblTit.setFont(new Font("Arial", Font.BOLD, 18));
-                    lblTit.setForeground(Color.WHITE);
-                    lblTit.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                    JLabel lblAn = new JLabel("Año: " + anio);
-                    lblAn.setFont(new Font("Arial", Font.PLAIN, 14));
-                    lblAn.setForeground(new Color(200, 200, 200));
-                    lblAn.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                    panelTitulo.add(lblTit);
-                    panelTitulo.add(Box.createVerticalStrut(5));
-                    panelTitulo.add(lblAn);
-
-                    dialogo.add(panelTitulo, BorderLayout.NORTH);
-
-                    JPanel panelSinopsis = new JPanel();
-                    panelSinopsis.setLayout(new BorderLayout());
-                    panelSinopsis.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-
-                    JLabel lblSinopsisTitulo = new JLabel("Sinopsis:");
-                    lblSinopsisTitulo.setFont(new Font("Arial", Font.BOLD, 14));
-
-                    JTextArea txtSinopsis = new JTextArea(sinopsis);
-                    txtSinopsis.setEditable(false);
-                    txtSinopsis.setLineWrap(true);
-                    txtSinopsis.setWrapStyleWord(true);
-                    txtSinopsis.setFont(new Font("Arial", Font.PLAIN, 12));
-                    txtSinopsis.setBackground(new Color(245, 245, 245));
-                    txtSinopsis.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-                    JScrollPane scrollSinopsis = new JScrollPane(txtSinopsis);
-                    scrollSinopsis.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-                    panelSinopsis.add(lblSinopsisTitulo, BorderLayout.NORTH);
-                    panelSinopsis.add(scrollSinopsis, BorderLayout.CENTER);
-
-                    dialogo.add(panelSinopsis, BorderLayout.CENTER);
-
-                    JPanel panelBotones = new JPanel();
-                    panelBotones.setBorder(BorderFactory.createEmptyBorder(10, 15, 15, 15));
-
-                    JButton btnCerrar = new JButton("Cerrar");
-                    btnCerrar.addActionListener(e -> dialogo.dispose());
-
-                    panelBotones.add(btnCerrar);
-                    dialogo.add(panelBotones, BorderLayout.SOUTH);
-
-                    dialogo.revalidate();
-                    dialogo.repaint();
+                        VistaDetallesPelicula ventanaDetalles = new VistaDetallesPelicula((JFrame) this.getParent(), titulo, anio, sinopsis, rating);
+                        ventanaDetalles.mostrar();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                "No se encontró la película '" + p.getTitulo() + "' en OMDb.",
+                                "Sin resultados", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 });
             } catch (Exception e) {
                 SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(dialogo, 
+                    dialogoCarga.dispose();
+                    JOptionPane.showMessageDialog(this,
                             "Error al obtener la sinopsis: " + e.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
-                    dialogo.dispose();
                 });
             }
         }).start();
+
+        dialogoCarga.setVisible(true);
     }
 
     /**
